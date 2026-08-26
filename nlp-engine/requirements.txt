@@ -1,0 +1,18 @@
+# ScriptGrade NLP/AI Engine — Python 3.11+
+# Alibaba Cloud AI Hackathon 2026 — Muhammad Musa (Lead AI/NLP Architect)
+
+# Async HTTP transport for Alibaba Cloud DashScope (Qwen-2.5 / Qwen-VL / Text-Embedding)
+httpx>=0.27,<1.0
+
+# Structured data contracts & environment configuration
+pydantic>=2.7,<3.0
+pydantic-settings>=2.3,<3.0
+
+# Numeric kernels — cosine similarity over pgvector embeddings
+numpy>=1.26
+
+# Directed Acyclic Graph (DAG) procedural order verification (Debugger V)
+networkx>=3.3
+
+# Async PostgreSQL driver for AnalyticDB (pgvector)
+asyncpg>=0.29

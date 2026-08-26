@@ -1,0 +1,5 @@
+# NLP Engine local artifacts
+venv/
+__pycache__/
+*.pyc
+.env
