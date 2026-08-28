@@ -1,0 +1,1 @@
+"""ScriptGrade FastAPI application package."""
