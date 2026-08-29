@@ -1,53 +1,59 @@
 <div align="center">
 
-# 📝 ScriptGrade
+<br/>
 
-### Multi-Modal Handwritten Answer Script Automated Evaluation System
+```
+███████╗ ██████╗██████╗ ██╗██████╗ ████████╗ ██████╗ ██████╗  █████╗ ██████╗ ███████╗
+██╔════╝██╔════╝██╔══██╗██║██╔══██╗╚══██╔══╝██╔════╝ ██╔══██╗██╔══██╗██╔══██╗██╔════╝
+███████╗██║     ██████╔╝██║██████╔╝   ██║   ██║  ███╗██████╔╝███████║██║  ██║█████╗  
+╚════██║██║     ██╔══██╗██║██╔═══╝    ██║   ██║   ██║██╔══██╗██╔══██║██║  ██║██╔══╝  
+███████║╚██████╗██║  ██║██║██║        ██║   ╚██████╔╝██║  ██║██║  ██║██████╔╝███████╗
+╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝        ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝
+```
 
-**Built for the Alibaba Cloud AI Hackathon Pakistan 2026**
+### *Enterprise Automated Script Grading & Diagnostic Platform*
+#### Grading that thinks like a teacher — at machine speed.
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge&logo=github)](#)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](#)
-[![Alibaba Cloud](https://img.shields.io/badge/Alibaba%20Cloud-Qwen--2.5%20%7C%20Qwen--VL-FF6A00?style=for-the-badge&logo=alibabacloud&logoColor=white)](#)
-[![AnalyticDB](https://img.shields.io/badge/AnalyticDB-PostgreSQL%20%2B%20pgvector-2496ED?style=for-the-badge&logo=postgresql&logoColor=white)](#)
-[![Next.js](https://img.shields.io/badge/Next.js-14%2B-000000?style=for-the-badge&logo=next.js&logoColor=white)](#)
-[![FastAPI](https://img.shields.io/badge/FastAPI-Python%203.11%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](#)
+<br/>
+
+[![Alibaba Cloud](https://img.shields.io/badge/Alibaba%20Cloud-DashScope%20%7C%20Qwen3.8--Max-FF6A00?style=for-the-badge&logo=alibabacloud&logoColor=white)](#)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Async%20Python%203.11+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](#)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pgvector-2496ED?style=for-the-badge&logo=postgresql&logoColor=white)](#)
+[![React Native](https://img.shields.io/badge/React%20Native-Expo-61DAFB?style=for-the-badge&logo=react&logoColor=black)](#)
+[![React](https://img.shields.io/badge/React-Tailwind%20CSS-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white)](#)
+[![OSS](https://img.shields.io/badge/Alibaba%20OSS-Object%20Storage-FF6A00?style=for-the-badge&logo=alibabacloud&logoColor=white)](#)
+[![License](https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge)](#)
+[![Hackathon](https://img.shields.io/badge/Alibaba%20Cloud%20AI%20Hackathon-Pakistan%202026-FF6A00?style=for-the-badge&logo=alibabacloud&logoColor=white)](#)
+
+<br/>
+
+[![▶ Watch Full Demo](https://img.shields.io/badge/▶%20Watch%20Full%20Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](#)
+[![📊 Presentation Deck](https://img.shields.io/badge/📊%20Presentation%20Deck-FF6A00?style=for-the-badge&logo=alibabacloud&logoColor=white)](#)
+[![🚀 Try Live App](https://img.shields.io/badge/🚀%20Try%20Live%20App-4F46E5?style=for-the-badge&logo=vercel&logoColor=white)](#)
+
+> 💡 **Quick Judge Access:** Hit **"Quick Demo Access"** on the `/login` screen — credentials are pre-filled, landing you in a live pre-seeded dashboard in under 5 seconds. No signup required.
 
 </div>
 
 ---
 
-## 🎥 Live Video Demo
-
-<div align="center">
-
-[![ScriptGrade Live Demo](https://img.shields.io/badge/▶%20Watch%20Full%20Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](#)
-[![Presentation Deck](https://img.shields.io/badge/📊%20Presentation%20Deck-FF6A00?style=for-the-badge&logo=alibabacloud&logoColor=white)](#)
-[![Live App](https://img.shields.io/badge/🚀%20Try%20Live%20App-4F46E5?style=for-the-badge&logo=vercel&logoColor=white)](#)
-
-> **Quick Judge Access:** Click **"Quick Demo Access"** on the `/login` screen — credentials are pre-filled, landing you in a live pre-seeded dashboard in under 5 seconds.
-
-</div>
-
----
-
-## 📸 Application Screenshots / UI Wireframes
+## 📸 UI Showcase
 
 <div align="center">
 
 | Page 1 — Auth & Login | Page 2 — Exam Hub Dashboard |
 |:---:|:---:|
-| ![Login Screen](https://via.placeholder.com/600x380/4F46E5/FFFFFF?text=Page+1%3A+Auth+%2F+Login) | ![Dashboard](https://via.placeholder.com/600x380/4F46E5/FFFFFF?text=Page+2%3A+Exam+Hub+Dashboard) |
+| ![Login](https://via.placeholder.com/600x380/4F46E5/FFFFFF?text=Page+1%3A+Auth+%2F+Login) | ![Dashboard](https://via.placeholder.com/600x380/4F46E5/FFFFFF?text=Page+2%3A+Exam+Hub+Dashboard) |
 
-| Page 3 — AI Rubric Studio | Page 4 — Batch Upload & Scan Portal |
+| Page 3 — AI Rubric Studio | Page 4 — Dual Ingestion Portal |
 |:---:|:---:|
-| ![Rubric Studio](https://via.placeholder.com/600x380/FF6A00/FFFFFF?text=Page+3%3A+AI+Rubric+Studio) | ![Upload Portal](https://via.placeholder.com/600x380/FF6A00/FFFFFF?text=Page+4%3A+Batch+Upload+Portal) |
+| ![Rubric](https://via.placeholder.com/600x380/FF6A00/FFFFFF?text=Page+3%3A+AI+Rubric+Studio) | ![Upload](https://via.placeholder.com/600x380/FF6A00/FFFFFF?text=Page+4%3A+Dual+Ingestion+Portal) |
 
-| Page 5 — Master Grading Workspace |
+| Page 5 — Master Grading & 8-Debugger Diagnostic Workspace |
 |:---:|
-| ![Master Workspace](https://via.placeholder.com/1200x480/2496ED/FFFFFF?text=Page+5%3A+Master+Grading+%26+Diagnostic+Workspace) |
+| ![Workspace](https://via.placeholder.com/1200x480/2496ED/FFFFFF?text=Page+5%3A+Master+Grading+%26+8-Debugger+Diagnostic+Workspace) |
 
-> 🔁 *Replace placeholder URLs with actual screenshots or a GIF walkthrough before submission.*
+> 🔁 *Replace placeholders with real screenshots or a GIF walkthrough before submission.*
 
 </div>
 
@@ -55,84 +61,231 @@
 
 ## 1. Executive Summary
 
-**ScriptGrade** is a teacher-first, enterprise-grade SaaS platform that transforms the single most time-consuming task in education — grading descriptive, handwritten exam papers — into an automated, bias-free, and fully auditable workflow.
+**ScriptGrade** is a teacher-first, enterprise-grade SaaS platform that eliminates the single most time-consuming task in education — grading handwritten descriptive exam papers — and replaces it with a fully automated, bias-free, and auditable AI workflow.
 
-Powered end-to-end by **Alibaba Cloud's Qwen-2.5 (LLM)** and **Qwen-VL (Vision-Language Model)**, ScriptGrade reads a teacher's rubric intent from a single sample answer, understands a student's handwriting (including diagrams and flowcharts), and produces a defensible, itemized score in seconds — not hours.
+Powered end-to-end by **Alibaba Cloud DashScope (Qwen3.8-Max)**, ScriptGrade reads a teacher's rubric intent from a single sample answer, comprehends student handwriting across **English and three Asian regional scripts** (Urdu, Sindhi, Punjabi/Nastaliq), and produces a defensible, itemized score with a full diagnostic breakdown in seconds — not hours.
 
-> **The value proposition in one line:** ScriptGrade doesn't just OCR handwriting — it *reasons* about correctness, catches manipulation attempts, and gives every score a transparent, teacher-editable audit trail.
+> **The value proposition in one sentence:** ScriptGrade doesn't just OCR handwriting — it *reasons* about correctness, catches manipulation and negation attempts, supports right-to-left regional languages natively, and delivers every score with a transparent, teacher-editable audit trail.
 
-This isn't a toy OCR demo. It's a production-shaped monorepo with authenticated multi-tenant APIs, a relational + vector database schema, an 8-module adversarial diagnostic engine, and a polished 5-page enterprise UI — engineered specifically to showcase deep integration with Alibaba Cloud's AI and infrastructure stack.
+This is not a toy OCR demo. It is a production-shaped monorepo featuring a **Dual-Ingestion Pipeline** (Mobile Camera Scanner App + Desktop Web Dashboard), authenticated multi-tenant APIs, a relational + vector database schema, an **8-Debugger NLP Diagnostic Engine**, and a polished enterprise UI — engineered to showcase deep, load-bearing integration with Alibaba Cloud's AI and infrastructure stack.
 
 ---
 
-## 2. Problem Statement vs. Solution
+## 2. The Problem vs. The ScriptGrade Solution
 
-| ❌ The Problem (Traditional Manual Grading) | ✅ The ScriptGrade Solution |
+| ❌ The Problem (Manual Grading Reality) | ✅ The ScriptGrade Solution |
 |---|---|
-| Teachers spend **hours per class** manually reading and scoring descriptive answers. | **Qwen-VL + Qwen-2.5** evaluate a full class batch in minutes via asynchronous Celery pipelines. |
-| Grading is **inconsistent** — the same answer can receive different marks depending on teacher fatigue or mood. | Deterministic, rubric-weighted scoring produces **repeatable, auditable results** every time. |
-| Students who **pad answers with fluff** or copy question text often score higher than concise, correct answers. | The **Anti-Fluff Density Scorer** normalizes score against factual content, not word count. |
-| Valid answers phrased differently (synonyms) or with **minor spelling slips** get unfairly penalized. | **Synonym Clustering** + **Levenshtein Fuzzy Matching (≥85%)** reward true understanding. |
-| Students can **negate a required concept** ("Chlorophyll does *NOT* absorb sunlight") and still trigger keyword-matching tools. | The **Negation & Reversal Modifiers Engine** performs dependency parsing to catch reversed meaning. |
-| **Handwritten diagrams and flowcharts** are impossible for legacy OCR/keyword tools to grade. | **Qwen-VL Vision Inspector** detects diagram elements, arrows, and spatial labels directly from scanned images. |
-| Setting up a rubric for every exam is tedious ("**Teacher Setup Fatigue**"). | **Auto-Rubric Extraction** — teachers upload one sample answer; Qwen-2.5 generates concepts, weights, and synonyms instantly. |
-| Manual grading offers **zero data isolation or auditability** across institutions. | **JWT-secured, multi-tenant architecture** with full teacher override + moderation note logging. |
+| Teachers spend **3–6 hours per class** manually scoring descriptive answers | **Qwen3.8-Max** evaluates a full class batch in minutes via async pipelines |
+| Grading is **inconsistent** — fatigue, mood, and bias shift marks across the same paper | Deterministic, rubric-weighted scoring produces **repeatable, auditable results** every single time |
+| **Urdu, Sindhi, Punjabi/Nastaliq** handwritten scripts are completely unsupported by legacy tools | Qwen3.8-Max's multilingual VLM natively handles **RTL regional language OCR and semantic evaluation** |
+| Students who **pad answers with fluff** often outrank concise, accurate ones | The **Anti-Fluff Density Scorer** normalizes score against factual content ratio, not word count |
+| Valid phrasing (synonyms) or minor **handwriting slips** are unfairly penalized | **Synonym Clustering + Levenshtein Fuzzy Matching (≥85%)** reward true conceptual understanding |
+| Students can **negate a required concept** ("does NOT absorb sunlight") and still trigger naive keyword tools | The **Negation & Reversal Engine** performs dependency parsing to catch reversed meaning at the token level |
+| **Handwritten diagrams and flowcharts** are impossible for legacy OCR tools to grade | **Qwen3.8-Max Vision** detects diagram elements, arrows, and spatial labels directly from scanned images |
+| Grading workflows are **siloed** — mobile scans and desktop uploads follow completely separate, fragile paths | The **Dual-Ingestion Pipeline** unifies mobile camera scans and web batch uploads into a single OSS-backed queue |
+| Manual grading offers **zero auditability** — scores cannot be defended with evidence | **JWT-secured multi-tenant architecture** with itemized per-concept breakdowns and moderation note logging |
 
 ---
 
-## 3. Alibaba Cloud Ecosystem Mapping
+## 3. Alibaba Cloud Ecosystem — Deep Integration Map
 
-The table below documents precisely how each Alibaba Cloud service is wired into ScriptGrade's architecture — this is not a generic integration; every service plays a unique, load-bearing role.
+Every Alibaba Cloud service below plays a **unique, load-bearing role** in ScriptGrade's architecture. This is not a surface-level API call — it is a full-stack cloud-native integration.
 
 | Alibaba Cloud Service | Integration Point | Exact Role in ScriptGrade |
 |---|---|---|
-| **Qwen-2.5 / Qwen-Plus (LLM)** | NLP Engine → Rubric Studio → Diagnostic Engine | Structured JSON rubric extraction from sample answers; dependency parsing for negation token detection; semantic reasoning for comprehensive answer evaluation prompts |
-| **Qwen-VL (Vision-Language Model)** | NLP Engine → Upload Pipeline → Debugger VI | Handwritten answer sheet OCR with confidence scoring; flowchart and diagram element detection; spatial arrow and label verification from scanned PDFs and mobile images |
-| **DashScope API** | Backend `services/ai_client.py` | Unified API gateway for all Qwen model inference calls (both LLM and VL) — manages authentication, rate-limiting, and request routing to Qwen-2.5 and Qwen-VL endpoints |
-| **AnalyticDB for PostgreSQL (pgvector)** | Backend ORM + NLP Embeddings Layer | Dual-mode storage: relational tables for users, exams, rubrics, papers; pgvector extension for cosine-similarity semantic matching of student answer vectors against rubric concept embeddings |
-| **Alibaba Cloud OSS** | Celery Workers → Upload Pipeline → Export Engine | Persistent object store for scanned exam PDFs (batch upload), mobile-synced student images, and generated CSV/PDF class performance export reports |
-| **Alibaba Cloud ECS / Container Compute** | Full-stack deployment host | Hosts FastAPI uvicorn server, Celery workers, Redis broker, and Next.js SSR frontend in a containerized production environment |
-| **Alibaba Cloud Text Embedding Models** | `nlp-engine/embeddings/` | Generates high-dimensional vector embeddings for rubric concepts and student answer tokens, stored and queried in AnalyticDB pgvector for semantic matching |
+| **Qwen3.8-Max (LLM + VLM)** | NLP Engine · Rubric Studio · 8-Debugger Core | Structured JSON rubric extraction from sample answers; handwritten OCR across English, Urdu, Sindhi, Punjabi/Nastaliq; dependency parsing for negation detection; diagram and flowchart visual element verification |
+| **DashScope API** | `backend/services/ai_client.py` | Unified inference gateway for all Qwen3.8-Max calls — manages authentication, rate-limiting, streaming, and routing to both LLM and VLM endpoints from a single client |
+| **OSS (Object Storage Service)** | Dual-Ingestion Pipeline · Export Engine | Persistent store for mobile camera scans, scanner PDFs, and generated CSV/PDF class performance reports; acts as the shared buffer between both ingestion channels and the async worker queue |
+| **PostgreSQL + pgvector** | Backend ORM · NLP Embeddings Layer | Dual-mode storage: relational tables for users, exams, rubrics, student papers; pgvector extension for cosine-similarity semantic matching of student answer embeddings against rubric concept vectors |
+| **ECS / Container Compute** | Full-Stack Deployment | Hosts FastAPI uvicorn server, Celery async workers, Redis broker, and React web dashboard in a containerized production environment |
+| **Text Embedding Models (DashScope)** | `nlp-engine/embeddings/` | Generates high-dimensional vectors for rubric concepts and student tokens — stored and queried in pgvector for semantic similarity matching |
 
 ---
 
-## 4. Key Features
+## 4. System Architecture
 
-### 🎯 Automated Rubric Extraction
-- One-click generation of weighted "magic concepts" from a single Question Paper + Sample Answer upload, powered by structured JSON prompting against **Qwen-2.5 / Qwen-Plus**.
-- Auto-generated **synonym clusters** (3–5 valid academic alternatives per concept).
-- Full manual override: add, edit, delete, and re-weight any AI-extracted keyword in the **Interactive Magic Concepts Editor**.
+### 4.1 End-to-End Architecture Diagram
 
-### 👁️ Multi-Modal Vision OCR
-- **Qwen-VL** transcribes handwritten scripts (scanner PDFs or mobile-synced images) with confidence scoring.
-- Native support for **diagram, flowchart, and spatial-label verification** — not just plain text.
-- Bulk ingestion via office ADF scanners or QR-code-linked mobile sync, processed asynchronously through **Celery + Redis** workers.
+```mermaid
+flowchart TD
+    subgraph INGESTION ["⬛ Dual-Ingestion Pipeline"]
+        A1["📱 Mobile Camera Scanner App\n(React Native · Expo)\nEdge Detection · Auto-Crop · RTL Support"]
+        A2["🖥️ Web Office Dashboard\n(React · Tailwind CSS)\nBatch PDF Upload · ADF Scanner Sync"]
+    end
 
-### ⚙️ Dynamic Evaluation Engine
-- Real-time **cosine-similarity semantic matching** against rubric vectors stored in **AnalyticDB pgvector**.
-- Three teacher-configurable **sensitivity toggles**: Ignore Spelling, Strict Procedural Order, and Density Scoring.
-- Fully itemized, per-concept score breakdown returned as structured JSON for instant frontend rendering.
+    subgraph STORAGE ["☁️ Alibaba Cloud OSS"]
+        B["OSS Bucket\n(scriptgrade-scans)\nMobile Images · Scanner PDFs · Export Reports"]
+    end
 
-### 🩺 Diagnostic Debuggers
-- Every graded paper ships with a transparent **8-module diagnostic report**, giving teachers full visibility into *why* a score was awarded — not a black box.
-- Diagnostics feed directly into a **Teacher Manual Override Panel**, with moderation notes and real-time class analytics recalculation.
+    subgraph QUEUE ["⚙️ Async Worker Queue"]
+        C["Celery + Redis\n(Async Ingestion & OCR Dispatch)"]
+    end
+
+    subgraph AI ["🤖 Alibaba Cloud DashScope — Qwen3.8-Max"]
+        D1["LLM Engine\nRubric Extraction · Negation Parsing\nSynonym Clustering · Structured JSON Output"]
+        D2["Vision-Language Engine\nHandwritten OCR (EN · اردو · سنڌي · ਪੰਜਾਬੀ)\nDiagram & Flowchart Visual Inspection"]
+    end
+
+    subgraph NLP ["🩺 8-Debugger NLP Diagnostic Engine"]
+        E["I Garbage Text Detector\nII Negation & Reversal Engine\nIII Synonym & Semantic Matcher\nIV Fuzzy Spelling Corrector\nV Sequence DAG Verifier\nVI Visual Inspector (Qwen-VL)\nVII Anti-Fluff Density Scorer\nVIII Rubric Score Aggregator"]
+    end
+
+    subgraph DB ["🗄️ PostgreSQL + pgvector"]
+        F["Relational: Users · Exams · Rubrics · Papers\nVector: Semantic Embeddings (cosine similarity)"]
+    end
+
+    subgraph API ["🔐 FastAPI Gateway"]
+        G["Async Python · JWT Auth\nMulti-Tenant Isolation · REST Contracts"]
+    end
+
+    subgraph UI ["🎨 Web Office Dashboard"]
+        H["React + Tailwind CSS\nMaster Grading Workspace\n8-Debugger Visual Metrics · Override Panel"]
+    end
+
+    A1 -->|"Camera capture + edge-crop"| B
+    A2 -->|"Batch PDF / ADF upload"| B
+    B --> C
+    C --> D2
+    D2 -->|"OCR Transcript + Bounding Boxes"| E
+    D1 -->|"Rubric JSON + Synonym Clusters"| E
+    E --> F
+    F --> G
+    G --> H
+    H -->|"Teacher override + moderation notes"| F
+
+    style A1 fill:#4F46E5,color:#fff
+    style A2 fill:#4F46E5,color:#fff
+    style B fill:#FF6A00,color:#fff
+    style D1 fill:#FF6A00,color:#fff
+    style D2 fill:#FF6A00,color:#fff
+    style E fill:#7C3AED,color:#fff
+    style F fill:#2496ED,color:#fff
+    style G fill:#059669,color:#fff
+    style H fill:#4F46E5,color:#fff
+```
+
+### 4.2 ASCII Architecture Summary
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    DUAL-INGESTION PIPELINE                          │
+│  📱 Mobile Scanner App (RN Expo)   🖥️ Web Dashboard (React/Tailwind) │
+│      Edge Detection · Auto-Crop         Batch PDF · ADF Scanner     │
+└──────────────────────┬──────────────────────────┬───────────────────┘
+                       │                          │
+                       ▼                          ▼
+            ┌──────────────────────────────────────────┐
+            │       Alibaba Cloud OSS (scriptgrade-scans) │
+            │   Mobile Images · Scanner PDFs · Reports    │
+            └─────────────────────┬────────────────────┘
+                                  │
+                                  ▼
+                    ┌─────────────────────────┐
+                    │   Celery + Redis Queue   │
+                    │   (Async OCR Dispatch)   │
+                    └────────────┬────────────┘
+                                 │
+              ┌──────────────────┴──────────────────┐
+              ▼                                      ▼
+  ┌───────────────────────┐          ┌───────────────────────────────┐
+  │  DashScope · Qwen3.8  │          │  DashScope · Qwen3.8-Max VLM  │
+  │  (LLM — Text Engine)  │          │  (Vision — OCR + Diagrams)    │
+  │  Rubric Extraction    │          │  EN · اردو · سنڌي · ਪੰਜਾਬੀ   │
+  └────────────┬──────────┘          └──────────────┬────────────────┘
+               │                                    │
+               └──────────────┬─────────────────────┘
+                              ▼
+            ┌─────────────────────────────────────────┐
+            │      8-Debugger NLP Diagnostic Engine    │
+            │  Garbage · Negation · Synonym · Fuzzy    │
+            │  DAG Seq · Visual · Density · Aggregator │
+            └─────────────────────┬───────────────────┘
+                                  │
+                                  ▼
+            ┌─────────────────────────────────────────┐
+            │    PostgreSQL + pgvector (AnalyticDB)    │
+            │   Relational Schema + Vector Embeddings  │
+            └─────────────────────┬───────────────────┘
+                                  │
+                                  ▼
+            ┌─────────────────────────────────────────┐
+            │  FastAPI Gateway (Async · JWT · REST)    │
+            └─────────────────────┬───────────────────┘
+                                  │
+                                  ▼
+            ┌─────────────────────────────────────────┐
+            │  React Web Dashboard (Tailwind CSS)      │
+            │  Master Grading · Diagnostics · Override │
+            └─────────────────────────────────────────┘
+```
 
 ---
 
-## 5. The 8 Vulnerability Edge-Case Debuggers
+## 5. Core Feature Breakdown
 
-ScriptGrade's grading brain is only as trustworthy as its ability to defend against the ways students (intentionally or not) game naive keyword-matching systems. These eight modules — engineered by the AI/NLP team — form the diagnostic core surfaced on the **Master Grading Workspace**.
+### 🌐 Regional Language Support — English & Asian Scripts
 
-| # | Debugger | What It Catches | Core Technique |
+ScriptGrade is built specifically for South Asian educational contexts where English alone is insufficient.
+
+| Language | Script | Direction | Qwen3.8-Max Capability |
 |---|---|---|---|
-| **I** | **Garbage Text & Hallucination Detector** | Filler text, nonsensical sentences, or copied question text used to pad length | Sentence-level cosine similarity vs. rubric vectors (flags if `< 0.35`) |
-| **II** | **Negation & Reversal Modifiers Engine** | Correct keywords used with reversed meaning ("does **NOT** absorb...") | Qwen-2.5 dependency parsing for negation tokens (`not`, `never`, `fails to`, `without`) |
-| **III** | **Synonym & Semantic Matcher** | Valid alternative phrasing penalized by rigid keyword tools | Vector similarity search against pre-generated synonym clusters |
-| **IV** | **Fuzzy Spelling Auto-Correction** | Minor handwriting/spelling slips unfairly deducted | Levenshtein Distance, auto-corrected at **≥85%** token match |
-| **V** | **Sequence & Procedural DAG Verifier** | Out-of-order steps in procedural answers | NetworkX Directed Acyclic Graph (DAG) transition validation |
-| **VI** | **Qwen-VL Diagram & Visual Inspector** | Diagrams, flowcharts, and arrows that plain-text OCR cannot grade | Qwen-VL region dispatch for visual element + spatial label detection |
-| **VII** | **Anti-Fluff Information Density Scorer** | Length bias — verbose answers outscoring concise, correct ones | `Density Ratio = (Valid Keyword Hits / Total Word Count) × 100` |
-| **VIII** | **Itemized Rubric Score Aggregator** | Opaque, unauditable final scores | Weighted sum of per-concept awards, capped at max marks, output as `rubric_breakdown` JSON |
+| **English** | Latin | LTR | Full OCR, semantic matching, diagram grading |
+| **Urdu** | Nastaliq / Naskh | RTL | Native OCR, tokenization, rubric matching |
+| **Sindhi** | Arabic-derived | RTL | OCR + semantic evaluation |
+| **Punjabi** | Nastaliq / Gurmukhi | RTL / LTR | OCR + keyword concept extraction |
+
+> Qwen3.8-Max's multilingual vision-language architecture handles right-to-left script directionality, diacritics (harakat), and mixed-language answer sheets natively — without preprocessing hacks.
+
+---
+
+### 🩺 The 8-Debugger NLP Diagnostic Engine
+
+Every graded paper ships with a transparent, itemized diagnostic report. Zero black boxes.
+
+| # | Debugger Module | What It Catches | Core Technique |
+|---|---|---|---|
+| **I** | **Garbage Text & Hallucination Detector** | Filler text, nonsensical sentences, copied question text used to pad length | Sentence-level cosine similarity vs. rubric vectors — flags if `score < 0.35` |
+| **II** | **Negation & Reversal Modifiers Engine** | Correct keywords used with reversed meaning ("does **NOT** absorb...") | Qwen3.8-Max dependency parsing for negation tokens (`not`, `never`, `fails to`, `without`) bound to rubric concepts |
+| **III** | **Synonym & Semantic Matcher** | Valid alternative phrasing unfairly penalized by rigid keyword tools | pgvector cosine-similarity search against pre-generated synonym clusters |
+| **IV** | **Fuzzy Spelling Auto-Corrector** | Minor handwriting and spelling slips causing unfair deductions | Levenshtein Distance — auto-corrected at **≥85%** token match threshold |
+| **V** | **Sequence & Procedural DAG Verifier** | Out-of-order steps in procedural or scientific answers | NetworkX Directed Acyclic Graph (DAG) transition validation against reference order |
+| **VI** | **Qwen-VL Diagram & Visual Inspector** | Diagrams, flowcharts, labeled arrows that plain-text OCR cannot evaluate | Qwen3.8-Max VLM region dispatch for visual element + spatial label detection with bounding boxes |
+| **VII** | **Anti-Fluff Information Density Scorer** | Length bias — verbose answers outscoring concise, correct ones | `Density Ratio = (Valid Keyword Hits / Total Word Count) × 100` — flags below 30% threshold |
+| **VIII** | **Itemized Rubric Score Aggregator** | Opaque, unauditable final scores with no per-concept breakdown | Weighted sum of per-concept awards, capped at max marks, serialized as `rubric_breakdown` JSON |
+
+---
+
+### 📥 Dual-Ingestion Pipeline
+
+ScriptGrade unifies two physically separate grading realities into a single processing pipeline.
+
+#### Channel A — Mobile Camera Scanner App (React Native · Expo)
+
+Designed for field educators, invigilators, and schools without ADF scanners.
+
+- 📷 **Real-time edge detection** with automatic document boundary recognition
+- ✂️ **Auto-crop and perspective correction** — no flat surface or studio setup required
+- 🌐 **RTL script preview** — Urdu/Sindhi/Punjabi handwriting renders correctly in-app before upload
+- ☁️ **Direct OSS upload** — each scan is tagged `source: mobile` with student ID metadata
+- 📶 **Offline queue** — scans captured without connectivity are synced automatically on reconnect
+
+#### Channel B — Web Office Dashboard (React · Tailwind CSS)
+
+Designed for institutional administrators, exam offices, and bulk processing workflows.
+
+- 📄 **Batch PDF upload** — multi-page scanner output ingested in a single drag-and-drop action
+- 🖨️ **ADF scanner integration** — direct sync from institutional document scanners via the portal
+- 🏷️ **Source tagging** — all uploads tagged `source: web_dashboard` for audit trail differentiation
+- 📊 **Live ingestion status** — real-time Celery job progress shown on the dashboard
+- 📤 **Export engine** — class-level CSV and PDF performance reports generated to OSS on demand
+
+---
+
+### 🤖 Automated Rubric Extraction
+
+- One-click generation of weighted **magic concept keywords** from a single Question Paper + Sample Answer upload, powered by structured JSON prompting against **Qwen3.8-Max**
+- Auto-generated **synonym clusters** (3–5 valid academic alternatives per concept) stored as pgvector embeddings for semantic matching
+- Full teacher override: add, edit, delete, and re-weight any AI-extracted concept in the **Interactive Magic Concepts Editor**
 
 ---
 
@@ -140,43 +293,36 @@ ScriptGrade's grading brain is only as trustworthy as its ability to defend agai
 
 ### Algorithm I — Anti-Fluff Information Density Ratio (Debugger VII)
 
-The Density Scorer normalizes a student's raw keyword hit count against their total word count, preventing verbose, padding-heavy answers from outscoring concise, factually accurate ones.
-
 $$\text{Density Ratio} \ (\%) = \left( \frac{\sum_{i=1}^{n} \mathbf{1}[\text{token}_i \in \text{RubricKeywords}]}{\text{TotalWordCount}} \right) \times 100$$
 
 Where:
-- $n$ = total number of tokens in the student answer
-- $\mathbf{1}[\text{token}_i \in \text{RubricKeywords}]$ = indicator function — `1` if token matches a rubric keyword (exact, fuzzy ≥85%, or synonym), `0` otherwise
-- $\text{TotalWordCount}$ = total token count of the student's answer
-
-A `density_ratio` below a teacher-configured threshold (default: **30%**) triggers a length-bias flag in the diagnostic report.
-
----
+- $n$ = total token count in the student's answer
+- $\mathbf{1}[\text{token}_i \in \text{RubricKeywords}]$ = `1` if token matches a rubric keyword (exact, fuzzy ≥85%, or synonym cluster), `0` otherwise
+- A `density_ratio` below the teacher-configured threshold (default **30%**) triggers a length-bias flag in the diagnostic report
 
 ### Algorithm II — Weighted Rubric Score Aggregation (Debugger VIII)
-
-The Aggregator computes the final deterministic score by summing per-concept awarded points against teacher-defined weights, hard-capped at the exam's maximum marks.
 
 $$S_{\text{final}} = \min\left( \sum_{k=1}^{K} w_k \cdot m_k \;,\; S_{\max} \right)$$
 
 Where:
-- $K$ = total number of rubric concepts (magic keywords) defined for the exam
+- $K$ = total number of rubric concepts (magic keywords) for the exam
 - $w_k$ = teacher-assigned point weight for concept $k$
-- $m_k \in \{0, 1\}$ = match indicator for concept $k$ — `1` if the concept was detected (exact, synonym, or fuzzy match), `0` if absent or negated
+- $m_k \in \{0, 1\}$ = match indicator — `1` if detected (exact, synonym, or fuzzy); `0` if absent or negated
 - $S_{\max}$ = maximum achievable marks for the question
-
-The per-concept breakdown is serialized as a `rubric_breakdown` JSON array and returned via the REST API for complete frontend rendering.
+- The per-concept breakdown is serialized as a `rubric_breakdown` JSON array returned via REST API
 
 ---
 
-## 7. Real-Time Diagnostic JSON Response
+## 7. Live Diagnostic JSON — Full Response Contract
 
-The following is an exact example of the structured JSON payload the **8 Vulnerability Edge-Case Debugger Engine** returns after evaluating a student's answer sheet. This is the payload consumed by both the FastAPI response contract (`GET /api/v1/papers/{student_id}`) and the Master Grading Workspace UI.
+The following is the exact structured payload produced by the **8-Debugger Engine** for every graded paper — consumed by both the API response contract (`GET /api/v1/papers/{student_id}`) and the Master Grading Workspace UI.
 
 ```json
 {
   "student_id": "STU-102",
   "exam_id": "a3f7c891-12b4-4e3a-9d1c-bc7e234f5a10",
+  "ingestion_source": "mobile",
+  "language_detected": "en",
   "score": 10.0,
   "max_score": 10.0,
   "ocr_confidence": 96.5,
@@ -187,12 +333,12 @@ The following is an exact example of the structured JSON payload the **8 Vulnera
     "I_garbage_text": {
       "garbage_text_score": 0.02,
       "flagged": false,
-      "detail": "All sentences exceed contextual relevance threshold of 0.35. No filler or copied prompt text detected."
+      "detail": "All sentences exceed contextual relevance threshold 0.35. No filler or copied prompt text detected."
     },
     "II_negation_detection": {
       "negation_detected": false,
       "flagged_tokens": [],
-      "detail": "No negation modifiers (not, never, fails to, without) bound to magic concepts detected via dependency parse."
+      "detail": "No negation modifiers (not, never, fails to, without) bound to rubric concepts via dependency parse."
     },
     "III_synonym_match": {
       "synonym_matched": true,
@@ -200,7 +346,7 @@ The following is an exact example of the structured JSON payload the **8 Vulnera
         { "student_token": "solar energy", "rubric_concept": "Sunlight", "similarity_score": 0.94 },
         { "student_token": "green pigment", "rubric_concept": "Chlorophyll", "similarity_score": 0.91 }
       ],
-      "detail": "2 synonym clusters resolved via pgvector semantic similarity search."
+      "detail": "2 synonym clusters resolved via pgvector cosine-similarity semantic search."
     },
     "IV_spelling_correction": {
       "spelling_autocorrected": true,
@@ -223,22 +369,22 @@ The following is an exact example of the structured JSON payload the **8 Vulnera
         { "label": "Chloroplast", "bounding_box": [112, 88, 240, 195], "confidence": 93.1 },
         { "label": "Arrow: CO2 → Leaf", "bounding_box": [300, 140, 410, 160], "confidence": 89.5 }
       ],
-      "detail": "Qwen-VL Vision Inspector verified 2 diagram elements and 1 directional arrow from scanned image region."
+      "detail": "Qwen3.8-Max VLM verified 2 diagram elements and 1 directional arrow from scanned image region."
     },
     "VII_density_scorer": {
       "density_ratio": 88.5,
       "valid_keyword_hits": 5,
       "total_word_count": 28,
       "flagged": false,
-      "detail": "Information density (88.5%) well above the 30% fluff threshold. Answer is factually dense with minimal padding."
+      "detail": "Information density 88.5% — well above the 30% fluff threshold. Answer is factually dense."
     },
     "VIII_rubric_aggregator": {
       "rubric_breakdown": [
-        { "concept": "Sunlight",      "awarded": 3, "max": 3, "match_type": "synonym" },
-        { "concept": "Chlorophyll",   "awarded": 3, "max": 3, "match_type": "synonym" },
-        { "concept": "Glucose",       "awarded": 2, "max": 2, "match_type": "exact" },
-        { "concept": "CO2",           "awarded": 1, "max": 1, "match_type": "exact" },
-        { "concept": "Oxygen",        "awarded": 1, "max": 1, "match_type": "fuzzy" }
+        { "concept": "Sunlight",    "awarded": 3, "max": 3, "match_type": "synonym" },
+        { "concept": "Chlorophyll", "awarded": 3, "max": 3, "match_type": "synonym" },
+        { "concept": "Glucose",     "awarded": 2, "max": 2, "match_type": "exact"   },
+        { "concept": "CO2",         "awarded": 1, "max": 1, "match_type": "exact"   },
+        { "concept": "Oxygen",      "awarded": 1, "max": 1, "match_type": "fuzzy"   }
       ],
       "total_awarded": 10.0,
       "max_possible": 10.0,
@@ -255,78 +401,68 @@ The following is an exact example of the structured JSON payload the **8 Vulnera
 
 ---
 
-## 8. End-to-End System Architecture
+## 8. REST API Contract
 
-```mermaid
-flowchart TD
-    A["📄 Scanned Answer Sheet<br/>(ADF Scanner PDF / Mobile Sync Image)"] --> B["Alibaba Cloud OSS<br/>(Object Storage)"]
-    B --> C["Celery + Redis<br/>(Async Ingestion Queue)"]
+### Primary Upload Endpoint — Dual-Source Ingestion
 
-    Q["📋 Question Paper +<br/>Sample Reference Answer"] --> D["Qwen-2.5 / Qwen-Plus<br/>(Concept & Synonym Extraction)"]
-    D --> E["Rubric JSON<br/>(concepts, weights, synonyms, toggles)"]
+**`POST /api/v1/papers/upload`**
 
-    C --> F["Qwen-VL<br/>(Handwritten OCR + Diagram/Label Vision)"]
-    F --> G["OCR Transcript +<br/>Visual Bounding Boxes"]
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `file` | `multipart/form-data` | ✅ | Scanned image (mobile) or PDF file (web) |
+| `exam_id` | `UUID` | ✅ | Target exam identifier |
+| `student_id` | `string` | ✅ | Student roll number or unique ID |
+| `source` | `enum` | ✅ | `mobile` \| `web_dashboard` — ingestion channel tag |
+| `language` | `enum` | ✅ | `en` \| `ur` \| `sd` \| `pa` — script language hint |
+| `Authorization` | `Bearer <JWT>` | ✅ | Institutional teacher token |
 
-    E --> H["8 Vulnerability<br/>Edge-Case Debuggers Engine"]
-    G --> H
-
-    H --> I["AnalyticDB for PostgreSQL<br/>(pgvector — Semantic Embeddings + Relational Store)"]
-    I --> J["FastAPI Gateway<br/>(REST API + JWT Auth + Multi-Tenant Isolation)"]
-
-    J --> K["Next.js Frontend<br/>Master Grading Workspace"]
-    K --> L["👩‍🏫 Teacher Override,<br/>Moderation Notes & CSV/PDF Export"]
-    L -.->|feedback loop| I
-
-    style A fill:#4F46E5,color:#fff
-    style F fill:#FF6A00,color:#fff
-    style D fill:#FF6A00,color:#fff
-    style I fill:#2496ED,color:#fff
-    style K fill:#4F46E5,color:#fff
+**Response `202 Accepted`:**
+```json
+{
+  "job_id": "celery-job-uuid-xxxx",
+  "status": "queued",
+  "source": "mobile",
+  "oss_key": "exams/a3f7c891/STU-102/scan_1724076727.jpg",
+  "estimated_completion_seconds": 12
+}
 ```
 
-**Text-based flow summary:**
+### Full API Surface
 
-```
-[Scanned Answer Sheet] ──► Alibaba Cloud OSS ──► Celery/Redis Queue ──► Qwen-VL (OCR + Vision)
-                                                                              │
-[Question Paper + Sample Answer] ──► Qwen-2.5 (Rubric/Synonym Extraction)    │
-                                              │                              │
-                                              ▼                              ▼
-                                    8 Vulnerability Edge-Case Debuggers Engine
-                                                      │
-                                                      ▼
-                                AnalyticDB PostgreSQL (pgvector + Relational Store)
-                                                      │
-                                                      ▼
-                                  FastAPI Gateway (JWT Auth + REST Contracts)
-                                                      │
-                                                      ▼
-                              Next.js Frontend — Master Grading Workspace (UI)
-```
+| # | Endpoint | Method | Auth | Purpose |
+|---|---|---|---|---|
+| 1 | `/api/v1/auth/login` | `POST` | Public | Authenticate & issue JWT bearer token |
+| 2 | `/api/v1/auth/signup` | `POST` | Public | Register educator + institutional workspace |
+| 3 | `/api/v1/exams/list` | `GET` | 🔐 JWT | Dashboard metrics & exam logs |
+| 4 | `/api/v1/exam/setup` | `POST` | 🔐 JWT | Upload Q&A, trigger Qwen3.8-Max rubric extraction |
+| 5 | `/api/v1/exam/rubric` | `PUT` | 🔐 JWT | Save/edit rubric weights, synonyms, sensitivity toggles |
+| 6 | `/api/v1/papers/upload` | `POST` | 🔐 JWT | **Dual-ingestion upload** (mobile or web) → OSS → Celery |
+| 7 | `/api/v1/papers/batch-upload` | `POST` | 🔐 JWT | Bulk scanner PDF upload → OSS → Celery queue |
+| 8 | `/api/v1/papers/{student_id}` | `GET` | 🔐 JWT | Full evaluation + 8-debugger diagnostic JSON |
+| 9 | `/api/v1/papers/{student_id}/override` | `POST` | 🔐 JWT | Teacher manual score override + moderation notes |
+| 10 | `/api/v1/analytics/export` | `GET` | 🔐 JWT | Export class results as CSV/PDF to OSS |
 
 ---
 
 ## 9. Comprehensive Tech Stack
 
-| Layer | Technology | Purpose |
+| Layer | Technology | Role |
 |---|---|---|
-| **Frontend Framework** | Next.js 14+ (App Router) / React 18+ (Vite) | 5-page enterprise SaaS UI |
-| **Styling** | Tailwind CSS | Utility-first design system |
-| **UI Components** | Radix UI / Shadcn UI, Lucide React Icons | Accessible, composable component library |
-| **Data Visualization** | ApexCharts.js / Recharts | Class performance distribution, score analytics |
-| **State Management** | Zustand, TanStack React Query | Async API state, caching, optimistic updates |
-| **Backend Framework** | Python 3.11+ / FastAPI (asyncio + uvicorn) | High-performance async REST gateway |
-| **Task Queue** | Celery + Redis | Async multi-page PDF ingestion & OCR dispatch |
-| **Authentication** | OAuth2 + JWT, Passlib (Bcrypt) | Multi-tenant institutional data isolation |
-| **AI — LLM Engine** | **Alibaba Cloud Qwen-2.5 / Qwen-Plus** | Semantic reasoning, rubric & synonym extraction, negation parsing |
-| **AI — Vision Engine** | **Alibaba Cloud Qwen-VL** | Handwritten OCR, diagram & flowchart visual inspection |
-| **AI — API Gateway** | **Alibaba Cloud DashScope** | Unified inference endpoint for all Qwen model calls |
-| **Graph Logic** | NetworkX (Python) | Directed Acyclic Graph (DAG) procedural order verification |
-| **Core Algorithms** | Cosine Similarity, Levenshtein Distance, Token-Density Ratio | Semantic matching, fuzzy spelling, anti-fluff scoring |
-| **Vector & Relational DB** | **Alibaba Cloud AnalyticDB for PostgreSQL (pgvector)** | Semantic embeddings + structured exam/rubric/paper schemas |
-| **Object Storage** | **Alibaba Cloud OSS** | Scanned PDFs, student images, exported CSV/PDF reports |
-| **Cloud Infrastructure** | Alibaba Cloud (ECS / Container Compute, OSS, AnalyticDB) | End-to-end hosting & AI inference backbone |
+| **AI — LLM + Vision** | **Alibaba Cloud DashScope · Qwen3.8-Max** | Rubric extraction, multilingual OCR, negation parsing, diagram inspection |
+| **AI Gateway** | **DashScope API** | Unified inference endpoint for all Qwen3.8-Max LLM and VLM calls |
+| **Mobile Scanner App** | **React Native (Expo)** | Camera-based script scanning with edge detection and auto-crop |
+| **Web Dashboard** | **React + Tailwind CSS** | 5-page enterprise UI with dynamic 8-debugger visual metrics |
+| **Backend Framework** | **Python 3.11+ · FastAPI (asyncio + uvicorn)** | High-performance async REST gateway |
+| **Task Queue** | **Celery + Redis** | Async multi-page PDF ingestion & OCR dispatch |
+| **Authentication** | **OAuth2 + JWT · Passlib (Bcrypt)** | Multi-tenant institutional data isolation |
+| **Vector & Relational DB** | **PostgreSQL + pgvector** | Semantic embeddings + relational exam/rubric/paper schemas |
+| **Object Storage** | **Alibaba Cloud OSS** | Unified store for mobile scans, PDFs, and exported reports |
+| **Cloud Compute** | **Alibaba Cloud ECS / Container** | Full-stack containerized production hosting |
+| **Graph Logic** | **NetworkX (Python)** | DAG procedural order verification (Debugger V) |
+| **Algorithms** | **Cosine Similarity · Levenshtein · Density Ratio** | Semantic matching, fuzzy spelling, anti-fluff scoring |
+| **UI Components** | **Radix UI / Shadcn · Lucide Icons** | Accessible composable component library |
+| **Data Visualization** | **ApexCharts.js / Recharts** | Class performance distribution and score analytics |
+| **State Management** | **Zustand · TanStack React Query** | Async API state, caching, optimistic updates |
 
 ---
 
@@ -334,51 +470,73 @@ flowchart TD
 
 ```
 ScriptGrade/
-├── frontend/                        # Next.js 14+ — Rohail Khan Shinwari
+│
+├── mobile/                              # 📱 Mobile Scanner App — React Native (Expo)
 │   ├── app/
-│   │   ├── (auth)/login/            # Page 1: Auth (Login/Signup, SSO, Demo Access)
-│   │   ├── dashboard/               # Page 2: Exam Hub & Global Metrics
-│   │   ├── exam/setup/              # Page 3: AI Rubric Studio
-│   │   ├── exam/upload/             # Page 4: Batch Upload & Scan Portal
-│   │   └── exam/grade/              # Page 5: Master Grading Workspace
-│   ├── components/                  # Shared UI (tags editor, diagnostic tabs, charts)
-│   ├── lib/                         # API client, Zustand stores, React Query hooks
-│   ├── public/
+│   │   ├── (auth)/                      # Login, institutional SSO
+│   │   ├── scanner/                     # Camera, edge detection, auto-crop
+│   │   ├── preview/                     # RTL script preview before upload
+│   │   └── sync/                        # Offline queue + OSS upload
+│   ├── components/
+│   │   ├── EdgeDetector.tsx             # Real-time document boundary detection
+│   │   ├── AutoCrop.tsx                 # Perspective correction
+│   │   └── RTLPreview.tsx               # Urdu/Sindhi/Punjabi script preview
+│   ├── hooks/                           # useOfflineQueue, useOSSUpload
+│   ├── app.json
+│   └── package.json
+│
+├── frontend/                            # 🖥️ Web Office Dashboard — React + Tailwind CSS
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── login/                   # Page 1: Auth (Login/Signup, Demo Access)
+│   │   │   ├── dashboard/               # Page 2: Exam Hub & Global Metrics
+│   │   │   ├── exam/setup/              # Page 3: AI Rubric Studio
+│   │   │   ├── exam/upload/             # Page 4: Dual Ingestion Portal
+│   │   │   └── exam/grade/              # Page 5: Master Grading Workspace
+│   │   ├── components/
+│   │   │   ├── DebuggerPanel/           # 8-Debugger visual metric cards
+│   │   │   ├── RubricEditor/            # Interactive Magic Concepts Editor
+│   │   │   └── OverridePanel/           # Teacher manual override + notes
+│   │   ├── lib/                         # API client, Zustand stores, React Query
+│   │   └── styles/                      # Tailwind config & design tokens
 │   ├── tailwind.config.ts
 │   ├── package.json
-│   └── .env.local.example
+│   └── .env.example
 │
-├── backend/                         # FastAPI — Ishmal Khalid
+├── backend/                             # ⚙️ FastAPI Gateway — Async Python
 │   ├── app/
-│   │   ├── api/v1/                  # auth, exams, papers, analytics routers
-│   │   ├── models/                  # users, exams, rubrics, student_papers (SQLAlchemy)
-│   │   ├── schemas/                 # Pydantic request/response contracts
-│   │   ├── services/                # OSS upload, Celery tasks, AI client wrappers
-│   │   ├── core/                    # JWT auth, config, security
+│   │   ├── api/v1/                      # auth, exams, papers, analytics routers
+│   │   ├── models/                      # users, exams, rubrics, student_papers (SQLAlchemy)
+│   │   ├── schemas/                     # Pydantic request/response contracts
+│   │   ├── services/
+│   │   │   ├── ai_client.py             # DashScope / Qwen3.8-Max unified client
+│   │   │   ├── oss_client.py            # Alibaba Cloud OSS upload & signed URLs
+│   │   │   └── celery_worker.py         # Async OCR ingestion task definitions
+│   │   ├── core/                        # JWT auth, config, multi-tenant security
 │   │   └── main.py
-│   ├── alembic/                     # DB migrations (AnalyticDB PostgreSQL)
+│   ├── alembic/                         # DB migrations (PostgreSQL + pgvector)
 │   ├── requirements.txt
 │   └── .env.example
 │
-├── nlp-engine/                      # AI/NLP Pipeline — Muhammad Musa
+├── nlp-engine/                          # 🧠 8-Debugger NLP Pipeline
 │   ├── pipelines/
-│   │   ├── rubric_extraction.py     # Qwen-2.5 auto-rubric prompt pipeline
-│   │   ├── vision_ocr.py            # Qwen-VL OCR + diagram inspection
-│   │   └── evaluation_pipeline.py   # Orchestrates full 8-debugger scoring
+│   │   ├── rubric_extraction.py         # Qwen3.8-Max auto-rubric prompt pipeline
+│   │   ├── vision_ocr.py                # Qwen3.8-Max VLM OCR + diagram inspection
+│   │   └── evaluation_pipeline.py       # Orchestrates full 8-debugger scoring
 │   ├── debuggers/
-│   │   ├── garbage_text.py
-│   │   ├── negation_detector.py
-│   │   ├── synonym_matcher.py
-│   │   ├── fuzzy_spelling.py
-│   │   ├── sequence_dag.py          # NetworkX DAG verifier
-│   │   ├── visual_inspector.py
-│   │   ├── density_scorer.py
-│   │   └── rubric_aggregator.py
-│   ├── prompts/                     # Versioned JSON prompt templates
-│   ├── embeddings/                  # pgvector embedding utilities
+│   │   ├── garbage_text.py              # Debugger I
+│   │   ├── negation_detector.py         # Debugger II
+│   │   ├── synonym_matcher.py           # Debugger III
+│   │   ├── fuzzy_spelling.py            # Debugger IV
+│   │   ├── sequence_dag.py              # Debugger V — NetworkX DAG verifier
+│   │   ├── visual_inspector.py          # Debugger VI — Qwen3.8-Max VLM dispatch
+│   │   ├── density_scorer.py            # Debugger VII
+│   │   └── rubric_aggregator.py         # Debugger VIII
+│   ├── prompts/                         # Versioned JSON prompt templates
+│   ├── embeddings/                      # pgvector embedding utilities
 │   └── requirements.txt
 │
-├── docs/                            # PRDs, API contracts, architecture diagrams
+├── docs/                                # PRDs, API contracts, architecture diagrams
 ├── docker-compose.yml
 ├── .gitignore
 └── README.md
@@ -386,60 +544,73 @@ ScriptGrade/
 
 ---
 
-## 11. Local Environment Setup & Quickstart Guide
+## 11. Quick Start & Installation Guide
 
 ### Prerequisites
 
-| Requirement | Version |
-|---|---|
-| Node.js | 18.x+ |
-| Python | 3.11+ |
-| PostgreSQL client / AnalyticDB access | pgvector-enabled |
-| Redis | 7.x+ (for Celery broker) |
-| Alibaba Cloud Account | Qwen-2.5, Qwen-VL API access + OSS bucket |
+| Requirement | Version | Notes |
+|---|---|---|
+| **Node.js** | 18.x+ | For web frontend and mobile Expo builds |
+| **Python** | 3.11+ | Backend and NLP engine |
+| **PostgreSQL** | 14+ with pgvector | pgvector extension required |
+| **Redis** | 7.x+ | Celery task broker |
+| **Expo CLI** | Latest | `npm install -g expo-cli` |
+| **Alibaba Cloud Account** | — | DashScope API key · OSS bucket · ECS access |
 
-### 1. Clone the Repository
+---
+
+### Step 1 — Clone the Repository
 
 ```bash
 git clone https://github.com/<your-org>/scriptgrade.git
 cd scriptgrade
 ```
 
-### 2. Configure Environment Variables
+---
+
+### Step 2 — Configure Environment Variables
 
 **`backend/.env`**
 ```env
-# Alibaba Cloud AI (DashScope)
-QWEN_API_KEY=your_alibaba_dashscope_api_key
-QWEN_LLM_MODEL=qwen-plus
-QWEN_VL_MODEL=qwen-vl-plus
+# ── Alibaba Cloud AI (DashScope) ─────────────────────────────────────
+DASHSCOPE_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+QWEN_MODEL=qwen3-8b-max
+QWEN_VL_MODEL=qwen-vl-max
 
-# AnalyticDB for PostgreSQL
-DATABASE_URL=postgresql+asyncpg://user:password@analyticdb-host:5432/scriptgrade
+# ── PostgreSQL + pgvector ─────────────────────────────────────────────
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/scriptgrade
 PGVECTOR_ENABLED=true
 
-# Alibaba Cloud OSS
+# ── Alibaba Cloud OSS ─────────────────────────────────────────────────
 OSS_ACCESS_KEY_ID=your_access_key_id
 OSS_ACCESS_KEY_SECRET=your_access_key_secret
 OSS_BUCKET_NAME=scriptgrade-scans
 OSS_ENDPOINT=oss-ap-southeast-1.aliyuncs.com
 
-# Auth
-JWT_SECRET_KEY=your_super_secret_key
+# ── Auth ──────────────────────────────────────────────────────────────
+JWT_SECRET_KEY=your_super_secret_key_min_32_chars
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 
-# Task Queue
+# ── Task Queue ────────────────────────────────────────────────────────
 REDIS_URL=redis://localhost:6379/0
 ```
 
-**`frontend/.env.local`**
+**`frontend/.env`**
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1
-NEXT_PUBLIC_APP_NAME=ScriptGrade
+VITE_API_BASE_URL=http://localhost:8000/api/v1
+VITE_APP_NAME=ScriptGrade
 ```
 
-### 3. Backend Setup (FastAPI)
+**`mobile/.env`**
+```env
+EXPO_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1
+EXPO_PUBLIC_OSS_BUCKET=scriptgrade-scans
+```
+
+---
+
+### Step 3 — Backend Setup (FastAPI)
 
 ```bash
 cd backend
@@ -448,17 +619,19 @@ source venv/bin/activate          # Windows: venv\Scripts\activate
 
 pip install -r requirements.txt
 
-# Run DB migrations against AnalyticDB PostgreSQL
+# Run DB migrations (creates tables + pgvector extension)
 alembic upgrade head
 
-# Start the FastAPI gateway
+# Start the FastAPI server
 uvicorn app.main:app --reload --port 8000
 
-# In a separate terminal — start the Celery worker for async OCR/PDF ingestion
+# In a second terminal — start the Celery async worker
 celery -A app.services.celery_worker worker --loglevel=info
 ```
 
-### 4. NLP/AI Engine Setup
+---
+
+### Step 4 — NLP Engine Validation
 
 ```bash
 cd nlp-engine
@@ -467,11 +640,16 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
-# Verify Qwen-2.5 / Qwen-VL connectivity
+# Verify Qwen3.8-Max DashScope connectivity
 python -m pipelines.rubric_extraction --healthcheck
+
+# Run the full 8-debugger engine on a sample paper
+python -m pipelines.evaluation_pipeline --sample
 ```
 
-### 5. Frontend Setup (Next.js)
+---
+
+### Step 5 — Web Dashboard Setup (React + Tailwind)
 
 ```bash
 cd frontend
@@ -479,47 +657,137 @@ npm install
 npm run dev
 ```
 
-### 6. Access the App
+---
 
-| Service | URL |
+### Step 6 — Mobile Scanner App Setup (React Native · Expo)
+
+```bash
+cd mobile
+npm install
+
+# iOS Simulator
+npx expo start --ios
+
+# Android Emulator
+npx expo start --android
+
+# Physical device — scan the QR code in the Expo Go app
+npx expo start
+```
+
+---
+
+### Step 7 — Service Access URLs
+
+| Service | URL | Notes |
+|---|---|---|
+| **Web Dashboard** | `http://localhost:5173` | React + Tailwind frontend |
+| **Backend API** | `http://localhost:8000` | FastAPI server |
+| **Swagger API Docs** | `http://localhost:8000/docs` | Interactive REST documentation |
+| **Celery Monitor** | `http://localhost:5555` | Flower task dashboard (optional) |
+
+> 💡 **Judges' Shortcut:** Use the **Quick Demo Access** button on `/login` to auto-fill credentials and jump directly into a pre-seeded live dashboard.
+
+---
+
+## 12. Docker Compose — One-Command Launch
+
+```bash
+docker-compose up --build
+```
+
+```yaml
+# docker-compose.yml (excerpt)
+services:
+  backend:
+    build: ./backend
+    ports: ["8000:8000"]
+    env_file: ./backend/.env
+    depends_on: [postgres, redis]
+
+  frontend:
+    build: ./frontend
+    ports: ["5173:5173"]
+    env_file: ./frontend/.env
+
+  nlp-engine:
+    build: ./nlp-engine
+    env_file: ./backend/.env
+    depends_on: [backend]
+
+  celery-worker:
+    build: ./backend
+    command: celery -A app.services.celery_worker worker --loglevel=info
+    env_file: ./backend/.env
+    depends_on: [redis, postgres]
+
+  postgres:
+    image: ankane/pgvector:latest
+    environment:
+      POSTGRES_DB: scriptgrade
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports: ["5432:5432"]
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+```
+
+---
+
+## 13. Hackathon Alignment & Business Impact
+
+### Alibaba Cloud Technology Depth
+
+ScriptGrade was purpose-built to showcase **maximum depth** of Alibaba Cloud integration — not breadth of surface-level API calls.
+
+| Evaluation Criterion | ScriptGrade Evidence |
 |---|---|
-| Frontend (UI) | `http://localhost:3000` |
-| Backend API Docs (Swagger) | `http://localhost:8000/docs` |
+| **AI Innovation** | Qwen3.8-Max drives the entire evaluation loop: rubric extraction, multilingual OCR, negation dependency parsing, diagram visual inspection — all from a single unified DashScope client |
+| **Cloud-Native Architecture** | OSS for persistent dual-channel storage, pgvector for semantic retrieval, ECS for containerized compute, Celery for async workload management |
+| **Regional Language Impact** | First-of-kind automated grading for Urdu, Sindhi, and Punjabi/Nastaliq — directly addressing Pakistan's 220M+ population educational infrastructure gap |
+| **Production Readiness** | JWT multi-tenant auth, alembic migrations, structured API contracts, Celery async workers, Docker Compose orchestration — this is a shippable system |
+| **Technical Completeness** | Dual ingestion (mobile + web), 8-debugger NLP engine, teacher override loop, CSV/PDF export, and a full 5-page enterprise UI |
 
-> 💡 **Judges' Tip:** Use the **Quick Demo Access** button on the `/login` screen to auto-fill credentials and jump straight into a pre-seeded dashboard for rapid evaluation.
+### Market & Social Impact
 
----
+> Pakistan administers over **6 million board-level handwritten exam scripts annually** across matric, intermediate, and university levels. Each paper is evaluated manually by an overworked examiner under institutional time pressure.
 
-## 12. REST API Contract Overview
-
-| # | Endpoint | Method | Purpose |
-|---|---|---|---|
-| 1 | `/api/v1/auth/login` | `POST` | Authenticate & issue JWT bearer token |
-| 2 | `/api/v1/auth/signup` | `POST` | Register educator + institutional workspace |
-| 3 | `/api/v1/exams/list` | `GET` | Dashboard metrics & exam logs |
-| 4 | `/api/v1/exam/setup` | `POST` | Upload Q&A, trigger Qwen-2.5 auto-rubric extraction |
-| 5 | `/api/v1/exam/rubric` | `PUT` | Save/edit rubric weights, synonyms, sensitivity toggles |
-| 6 | `/api/v1/papers/batch-upload` | `POST` | Bulk scanner PDF upload → OSS → Celery queue |
-| 7 | `/api/v1/papers/{student_id}` | `GET` | Full evaluation breakdown + 8-debugger diagnostics |
-| 8 | `/api/v1/papers/{student_id}/override` | `POST` | Teacher manual score override + moderation notes |
-| 9 | `/api/v1/analytics/export` | `GET` | Export class results as CSV/PDF |
+| Metric | Current State | ScriptGrade Target |
+|---|---|---|
+| **Grading Time per Paper** | 15–30 minutes | < 30 seconds |
+| **Language Coverage** | English only (digital tools) | English + Urdu + Sindhi + Punjabi |
+| **Score Consistency** | High variance across examiners | Deterministic, rubric-locked |
+| **Auditability** | None — single examiner judgment | Full per-concept diagnostic trail |
+| **Diagram Grading** | Manual or skipped | Qwen3.8-Max VLM bounding-box verification |
+| **Institutional Deployment** | Spreadsheets + physical papers | Cloud-native multi-tenant SaaS |
 
 ---
 
-## 13. Team Members & Roles
+## 14. Team
 
 | Member | Role | Core Responsibilities |
 |---|---|---|
-| **Muhammad Musa** | 🧠 **Lead AI / NLP Architect** | Qwen-2.5 & Qwen-VL inference pipelines, prompt engineering, pgvector semantic matching, all 8 Vulnerability Edge-Case Debuggers |
-| **Rohail Khan Shinwari** | 🎨 **Lead Frontend Engineer** | Next.js 5-page enterprise UI, Interactive Rubric Studio, Master Grading Workspace, full REST API integration |
-| **Ishmal Khalid** | ⚙️ **Lead Backend Engineer** | FastAPI microservices, AnalyticDB schema design, Celery async ingestion, JWT multi-tenant security, OSS integration |
+| **Muhammad Musa** | 🧠 Lead AI / NLP Architect | Qwen3.8-Max DashScope inference pipelines, prompt engineering, pgvector semantic matching, all 8 Vulnerability Debuggers, multilingual OCR strategy |
+| **Rohail Khan Shinwari** | 🎨 Lead Frontend Engineer | React + Tailwind 5-page enterprise UI, Interactive Rubric Studio, Master Grading Workspace, 8-Debugger visual metrics, full REST API integration |
+| **Ishmal Khalid** | ⚙️ Lead Backend Engineer | FastAPI microservices, PostgreSQL + pgvector schema design, Celery async ingestion, JWT multi-tenant security, OSS dual-channel integration |
 
 ---
 
 <div align="center">
 
-### Built with ❤️ and Qwen AI for the **Alibaba Cloud AI Hackathon Pakistan 2026**
+---
+
+### Built with ❤️, Qwen3.8-Max, and Alibaba Cloud DashScope
+#### **Alibaba Cloud AI Hackathon — Pakistan 2026**
 
 *ScriptGrade — Grading that thinks like a teacher, at machine speed.*
+
+[![Alibaba Cloud](https://img.shields.io/badge/Powered%20by-Alibaba%20Cloud%20DashScope-FF6A00?style=for-the-badge&logo=alibabacloud&logoColor=white)](#)
+[![Qwen3.8-Max](https://img.shields.io/badge/Model-Qwen3.8--Max-FF6A00?style=for-the-badge)](#)
+[![pgvector](https://img.shields.io/badge/Database-PostgreSQL%20%2B%20pgvector-2496ED?style=for-the-badge&logo=postgresql&logoColor=white)](#)
+
+---
 
 </div>
