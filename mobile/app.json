@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "ScriptGrade",
+    "slug": "scriptgrade",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "scriptgrade",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0B1020",
+    "primaryColor": "#4F46E5",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.scriptgrade.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "ScriptGrade uses the camera to scan exam papers and handwritten answer sheets for AI grading."
+      }
+    },
+    "android": {
+      "package": "com.scriptgrade.app",
+      "permissions": ["CAMERA"]
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow ScriptGrade to access your camera to scan exam papers and answer sheets."
+        }
+      ],
+      "expo-secure-store"
+    ]
+  }
+}
