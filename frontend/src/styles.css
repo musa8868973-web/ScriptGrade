@@ -1,0 +1,292 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * ScriptGrade design system — "Academic Monolith".
+ * Ultra-minimalist Paper & Ink: paper-white canvas, crisp white surfaces,
+ * hairline dividers, Oxford navy navigation, Scholar Blue accents, and an
+ * Emerald success accent for progress and positive actions.
+ * No glows, no drop shadows, no gradients-as-decoration.
+ */
+
+@theme inline {
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+  --radius-3xl: 14px;
+  --radius-4xl: 16px;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-nastaliq: "Noto Nastaliq Urdu", "Noto Naskh Arabic", serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand: var(--brand);
+  --color-brand-light: var(--brand-light);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-pass: var(--pass);
+  --color-alert: var(--alert);
+  --color-warn: var(--warn);
+  --color-vision: var(--vision);
+  --color-glass: var(--glass);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 6px;
+
+  /* Paper canvas + ink */
+  --background: oklch(0.984 0.003 247.858); /* #F8FAFC */
+  --foreground: oklch(0.208 0.042 265.755); /* #0F172A */
+  --card: oklch(1 0 0); /* #FFFFFF */
+  --card-foreground: oklch(0.208 0.042 265.755);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.208 0.042 265.755);
+
+  --primary: oklch(0.546 0.245 262.881); /* #2563EB Scholar Blue */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.968 0.007 247.896); /* #F1F5F9 */
+  --secondary-foreground: oklch(0.372 0.044 257.287); /* #334155 */
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.446 0.043 257.281); /* #475569 graphite */
+  --accent: oklch(0.968 0.007 247.896);
+  --accent-foreground: oklch(0.208 0.042 265.755);
+  --destructive: oklch(0.505 0.213 27.518); /* #B91C1C */
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.929 0.013 255.508); /* #E2E8F0 hairline */
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.546 0.245 262.881);
+
+  --brand: oklch(0.546 0.245 262.881); /* Scholar Blue */
+  --brand-light: oklch(0.488 0.217 264.376); /* deeper blue for text on paper */
+  --success: oklch(0.696 0.17 162.48); /* #10B981 emerald — progress & positive actions */
+  --success-foreground: oklch(1 0 0);
+  --pass: oklch(0.448 0.119 151.328); /* #166534 sage green */
+  --alert: oklch(0.505 0.213 27.518); /* #B91C1C */
+  --warn: oklch(0.554 0.152 60.5); /* #D97706 muted amber */
+  --vision: oklch(0.48 0.09 224); /* muted slate-teal */
+  --glass: oklch(1 0 0);
+
+  --chart-1: oklch(0.546 0.245 262.881);
+  --chart-2: oklch(0.448 0.119 151.328);
+  --chart-3: oklch(0.48 0.09 224);
+  --chart-4: oklch(0.554 0.152 60.5);
+  --chart-5: oklch(0.505 0.213 27.518);
+
+  /* Oxford navy navigation */
+  --sidebar: oklch(0.208 0.042 265.755); /* #0F172A */
+  --sidebar-foreground: oklch(0.929 0.013 255.508);
+  --sidebar-primary: oklch(0.546 0.245 262.881);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.279 0.041 260.031); /* slate-blue hover */
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(0.279 0.041 260.031);
+  --sidebar-ring: oklch(0.546 0.245 262.881);
+
+  /* Flat system — shadows exist only as hairlines */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-brand: 0 0 0 2px oklch(0.546 0.245 262.881 / 0.18);
+
+  --pill-bg: oklch(0.968 0.007 247.896); /* #F1F5F9 */
+  --pill-fg: oklch(0.372 0.044 257.287); /* #334155 */
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.005em;
+  }
+
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: oklch(0.546 0.245 262.881 / 0.16);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+  }
+}
+
+/* ── Surfaces: crisp paper, hairline border, no shadow ───────────── */
+@utility glass {
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+@utility glass-soft {
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+/* Restrained interaction: border/background only, never lift or glow */
+@utility lift {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+  &:hover {
+    border-color: color-mix(in oklab, var(--brand) 35%, var(--border));
+  }
+}
+
+@utility magnetic {
+  transition:
+    background-color 160ms ease,
+    opacity 160ms ease;
+  &:hover {
+    background-color: color-mix(in oklab, var(--brand) 88%, black);
+  }
+}
+
+@utility text-gradient-brand {
+  color: var(--brand);
+}
+
+@utility bg-gradient-brand {
+  background: var(--brand);
+}
+
+/* Soft, light-tinted status pill */
+@utility pill-soft {
+  background: var(--pill-bg);
+  color: var(--pill-fg);
+  border: 1px solid transparent;
+}
+
+/* Hairline rule used instead of card outlines */
+@utility rule {
+  border-bottom: 1px solid var(--border);
+}
+
+/* Dominant section header: subtle brand-tinted strip with a reinforced underline,
+   so headings before tables/charts read at a glance against body text. */
+@utility section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-md);
+  /* Static values first — fallback for browsers without color-mix support */
+  background: oklch(0.977 0.01 260);
+  border-bottom: 2px solid oklch(0.7 0.13 262);
+  background: color-mix(in oklab, var(--brand) 6%, var(--card));
+  border-bottom: 2px solid color-mix(in oklab, var(--brand) 50%, var(--border));
+  padding: 0.5rem 0.75rem;
+}
+
+@utility mono-token {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+}
+
+@utility nastaliq {
+  font-family: var(--font-nastaliq);
+  font-size: 1.125rem;
+  line-height: 2.2;
+}
+
+@utility spring-in {
+  animation: fade-in 200ms ease both;
+}
+
+@utility shimmer {
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    oklch(0.208 0.042 265.755 / 0.05) 45%,
+    transparent 70%
+  );
+  background-size: 220% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 180% 0;
+  }
+  to {
+    background-position: -80% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
