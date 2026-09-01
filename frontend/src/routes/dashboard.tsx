@@ -1,30 +1,23 @@
+import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Activity,
   ArrowUpRight,
+  ChevronRight,
   Clock,
   Download,
   FileSpreadsheet,
   Flag,
-  MoreHorizontal,
   Plus,
+  Search,
   Target,
-  Users,
   Wand2,
 } from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AppShell } from "@/components/layout/AppShell";
-import { StatusBadge } from "@/components/badges";
-import { useExams } from "@/lib/queries";
-import { scoreBands } from "@/lib/demo-data";
+import { useExams, usePaperQueue } from "@/lib/queries";
+import { DEMO_EXAM_ID, scoreBands } from "@/lib/demo-data";
+import type { PaperStatus } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/dashboard")({
@@ -71,10 +64,51 @@ function MetricCard({
   );
 }
 
+/**
+ * Percentage clamped to a strict 0–100 ceiling. Eliminates the >100% anomalies
+ * (e.g. 108%, 282.5%) that surface when a raw score exceeds the stored max.
+ */
+function clampPct(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(100, Math.max(0, value));
+}
+
+/** Paper lifecycle → teacher-facing roster status (spec §2: Graded/Moderated/Flagged). */
+const ROSTER_STATUS: Record<PaperStatus, { label: string; className: string }> = {
+  uploaded: { label: "Grading", className: "text-muted-foreground" },
+  queued: { label: "Grading", className: "text-muted-foreground" },
+  ocr_in_progress: { label: "Grading", className: "text-vision" },
+  flagged: { label: "Flagged", className: "text-alert" },
+  needs_review: { label: "Flagged", className: "text-warn" },
+  evaluated: { label: "Graded", className: "text-pass" },
+  scored: { label: "Graded", className: "text-pass" },
+  override_applied: { label: "Moderated", className: "text-brand" },
+  finalized: { label: "Graded", className: "text-pass" },
+  exported: { label: "Graded", className: "text-pass" },
+};
+
 function DashboardPage() {
   const { data, isLoading } = useExams();
   const navigate = useNavigate();
   const metrics = data?.metrics;
+
+  // Single-subject model — 1 teacher = 1 course/session, so the roster is that
+  // exam's student submissions (falls back to demo fixtures when offline).
+  const primaryExam = data?.exams[0] ?? null;
+  const examId = primaryExam?.id ?? DEMO_EXAM_ID;
+  const { data: roster } = usePaperQueue(primaryExam?.id ?? "");
+  const [query, setQuery] = useState("");
+  const rosterRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return (roster?.papers ?? []).filter(
+      (p) =>
+        !q ||
+        p.student_id.toLowerCase().includes(q) ||
+        (p.student_name ?? "").toLowerCase().includes(q),
+    );
+  }, [roster, query]);
+  const openStudio = (studentId: string) =>
+    navigate({ to: "/diagnostic-studio", search: { exam_id: examId, student_id: studentId } });
 
   return (
     <AppShell
@@ -91,14 +125,16 @@ function DashboardPage() {
     >
       {data?.demo && (
         <p className="mono-token mb-6 border-l-2 border-warn pl-3 text-xs text-warn">
-          FastAPI backend unreachable at /api/v1 — rendering demo fixtures. Start the backend to load
-          live data.
+          FastAPI backend unreachable at /api/v1 — rendering demo fixtures. Start the backend to
+          load live data.
         </p>
       )}
 
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         {isLoading || !metrics ? (
-          Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[104px] rounded-md" />)
+          Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-[104px] rounded-md" />
+          ))
         ) : (
           <>
             <MetricCard
@@ -133,76 +169,126 @@ function DashboardPage() {
         )}
       </div>
 
-      {/* Recent exams table */}
+      {/* Student roster / submissions — single-subject view (spec §1 & §2) */}
       <div className="mt-10">
-        <div className="section-title justify-between">
-          <h2 className="text-[0.9375rem] font-semibold tracking-tight">Recent Exams</h2>
-          <span className="mono-token text-[0.625rem] text-muted-foreground">
-            GET /api/v1/exams/list
-          </span>
+        <div className="section-title justify-between gap-4">
+          <div>
+            <h2 className="text-[0.9375rem] font-semibold tracking-tight">
+              Student Roster &amp; Submissions
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {primaryExam ? primaryExam.name : "Current subject"} · {rosterRows.length}{" "}
+              {rosterRows.length === 1 ? "student" : "students"}
+            </p>
+          </div>
+          <div className="relative">
+            <Search
+              size={14}
+              className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name or ID…"
+              aria-label="Search students by name or ID"
+              className="h-9 w-56 rounded-md border border-border bg-background pl-8 pr-3 text-sm outline-none placeholder:text-muted-foreground focus:border-brand"
+            />
+          </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-sm">
+          <table className="w-full min-w-[860px] text-left text-sm">
             <thead className="text-[0.625rem] tracking-wide text-muted-foreground uppercase">
               <tr className="border-b border-border">
-                <th className="py-3 pr-4 font-medium">Exam Name</th>
+                <th className="py-3 pr-4 font-medium">Student ID</th>
+                <th className="py-3 pr-4 font-medium">Student Name</th>
+                <th className="py-3 pr-4 font-medium">Assessment</th>
                 <th className="py-3 pr-4 font-medium">Date</th>
-                <th className="py-3 pr-4 font-medium">Class Size</th>
+                <th className="py-3 pr-4 font-medium">Score</th>
                 <th className="py-3 pr-4 font-medium">Status</th>
-                <th className="py-3 pr-4 font-medium">Class Avg</th>
-                <th className="py-3 text-right font-medium">Actions</th>
+                <th className="py-3 text-right font-medium">Action</th>
               </tr>
             </thead>
             <tbody>
-              {isLoading
-                ? Array.from({ length: 4 }).map((_, i) => (
-                    <tr key={i} className="border-b border-border">
-                      <td colSpan={6} className="py-4">
-                        <Skeleton className="h-5 w-full shimmer" />
-                      </td>
-                    </tr>
-                  ))
-                : data?.exams.map((exam) => (
-                    <tr key={exam.id} className="border-b border-border transition-colors hover:bg-success/10">
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-b border-border">
+                    <td colSpan={7} className="py-4">
+                      <Skeleton className="h-5 w-full shimmer" />
+                    </td>
+                  </tr>
+                ))
+              ) : rosterRows.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
+                    {query
+                      ? `No students match "${query}".`
+                      : "No submissions yet — upload answer sheets from Ingestion to populate this roster."}
+                  </td>
+                </tr>
+              ) : (
+                rosterRows.map((p) => {
+                  const pct =
+                    p.score !== null && p.max_score
+                      ? clampPct((p.score / p.max_score) * 100)
+                      : null;
+                  const status = ROSTER_STATUS[p.status];
+                  return (
+                    <tr
+                      key={p.id}
+                      onClick={() => openStudio(p.student_id)}
+                      className="cursor-pointer border-b border-border transition-colors hover:bg-success/10"
+                    >
+                      <td className="mono-token py-4 pr-4 font-medium">{p.student_id}</td>
                       <td className="py-4 pr-4">
-                        <Link
-                          to="/diagnostic-studio"
-                          search={{ exam_id: exam.id }}
-                          className="font-medium text-foreground hover:text-brand"
-                        >
-                          {exam.name}
-                        </Link>
+                        {p.student_name ?? (
+                          <span className="text-muted-foreground italic">Unnamed</span>
+                        )}
                       </td>
                       <td className="py-4 pr-4 text-muted-foreground">
-                        {new Date(exam.created_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        {primaryExam?.name ?? "—"}
+                      </td>
+                      <td className="py-4 pr-4 text-muted-foreground">
+                        {primaryExam
+                          ? new Date(primaryExam.created_at).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })
+                          : "—"}
                       </td>
                       <td className="py-4 pr-4">
-                        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                          <Users size={13} /> {exam.paper_count}
+                        <span className="mono-token font-medium">
+                          {pct === null ? "—" : `${pct.toFixed(0)}%`}
+                        </span>
+                        <span className="mono-token ml-1.5 text-xs text-muted-foreground">
+                          {p.score === null ? "—" : `${p.score}/${p.max_score}`}
                         </span>
                       </td>
                       <td className="py-4 pr-4">
-                        <StatusBadge status={exam.status} />
-                      </td>
-                      <td className="mono-token py-4 pr-4">
-                        {exam.avg_score === null
-                          ? "—"
-                          : `${((exam.avg_score / exam.max_score) * 100).toFixed(1)}%`}
+                        <span
+                          className={`pill-soft inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[0.6875rem] font-medium tracking-wide ${status.className}`}
+                        >
+                          <span className="size-1.5 rounded-full bg-current" />
+                          {status.label}
+                        </span>
                       </td>
                       <td className="py-4 pr-4 text-right">
                         <button
-                          aria-label={`Actions for ${exam.name}`}
-                          className="grid size-8 place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
+                          title="Inspect in Diagnostic Studio"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openStudio(p.student_id);
+                          }}
+                          className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-[0.6875rem] font-medium text-muted-foreground transition-colors hover:border-brand hover:text-brand"
                         >
-                          <MoreHorizontal size={15} />
+                          Inspect in Diagnostic Studio <ChevronRight size={12} />
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
