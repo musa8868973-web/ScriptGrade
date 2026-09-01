@@ -1,0 +1,7 @@
+.localstack/
+frontend/android/app/build/
+frontend/android/.gradle/
+*.apk
+
+# Stray toolchain install log (local build artifact)
+.localstack_install.log
