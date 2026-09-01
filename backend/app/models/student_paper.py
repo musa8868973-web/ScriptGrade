@@ -38,6 +38,8 @@ class StudentPaper(Base):
         nullable=True, index=True,
     )
     student_identifier: Mapped[str] = mapped_column(sa.String(128), nullable=False)
+    # Teacher-supplied display name mapped onto the auto-assigned identifier.
+    student_name: Mapped[str | None] = mapped_column(sa.String(255), nullable=True)
     scanned_image_url: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     ocr_transcript: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     ocr_confidence: Mapped[float | None] = mapped_column(sa.Float, nullable=True)

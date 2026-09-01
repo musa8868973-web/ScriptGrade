@@ -4,6 +4,7 @@
  * Shapes mirror the API contracts in PRD §5.2 exactly.
  */
 import type {
+  AnalyticsSummary,
   Exam,
   ExamsListResponse,
   MagicConcept,
@@ -72,6 +73,9 @@ export const demoConcepts: Omit<MagicConcept, "id">[] = [
 
 const languages = ["en", "ur", "sd", "pa"] as const;
 
+const FIRST_NAMES = ["Ayesha", "Bilal", "Comrade", "Dana", "Emaan", "Faizan", "Hira", "Ibrahim"];
+const LAST_NAMES = ["Khan", "Ahmed", "Malik", "Sheikh", "Bhatti", "Chaudhry", "Raza", "Qureshi"];
+
 function makePaper(i: number): QueuePaper {
   const id = 101 + i;
   const flagged = i % 17 === 2;
@@ -79,6 +83,10 @@ function makePaper(i: number): QueuePaper {
   return {
     id: `paper_${id}`,
     student_id: `STU-${id}`,
+    student_name:
+      processing && i % 2 === 0
+        ? null
+        : `${FIRST_NAMES[i % FIRST_NAMES.length]} ${LAST_NAMES[(i * 3) % LAST_NAMES.length]}`,
     source: i % 3 === 0 ? "mobile" : "web_dashboard",
     language: languages[i % 4]!,
     status: processing ? "ocr_in_progress" : flagged ? "needs_review" : "evaluated",
@@ -143,7 +151,9 @@ export function demoPaperDetail(studentId: string): PaperDetail {
           { student_token: "solar energy", rubric_concept: "Sunlight", similarity: 0.94 },
           ...(flagged
             ? []
-            : [{ student_token: "green pigment", rubric_concept: "Chlorophyll", similarity: 0.91 }]),
+            : [
+                { student_token: "green pigment", rubric_concept: "Chlorophyll", similarity: 0.91 },
+              ]),
         ],
       },
       spelling: {
@@ -195,7 +205,12 @@ export function demoPaperDetail(studentId: string): PaperDetail {
             max: 3,
             match_type: flagged ? "missed" : "synonym",
           },
-          { concept: "Glucose", award: flagged ? 0 : 2, max: 2, match_type: flagged ? "missed" : "exact" },
+          {
+            concept: "Glucose",
+            award: flagged ? 0 : 2,
+            max: 2,
+            match_type: flagged ? "missed" : "exact",
+          },
           { concept: "CO₂", award: 1, max: 1, match_type: "exact" },
           { concept: "Oxygen", award: flagged ? 0 : 1, max: 1, match_type: "fuzzy" },
         ],
@@ -230,3 +245,33 @@ export const debuggerAccuracy = [
   { name: "Density", value: 94 },
   { name: "Aggregator", value: 97 },
 ];
+
+/** Offline twin of GET /analytics/summary so the Analytics page stays whole. */
+export function demoAnalyticsSummary(examId: string): AnalyticsSummary {
+  return {
+    exam_id: examId,
+    title: "Biology 101 — Photosynthesis",
+    total_papers: demoQueue.papers.length,
+    scored_papers: demoQueue.papers.filter((p) => p.score !== null).length,
+    max_score: 10,
+    class_average: 7.84,
+    score_distribution: [2, 6, 14, 18, 8],
+    concept_mastery: [
+      { concept: "Sunlight", awarded: 2.7, max: 3, mastery_pct: 90 },
+      { concept: "Chlorophyll", awarded: 1.6, max: 3, mastery_pct: 48 },
+      { concept: "Glucose", awarded: 1.7, max: 2, mastery_pct: 74 },
+      { concept: "CO₂", awarded: 0.9, max: 1, mastery_pct: 88 },
+      { concept: "Oxygen", awarded: 0.8, max: 1, mastery_pct: 82 },
+    ],
+    debugger_breakdown: [
+      { key: "garbage", label: "Garbage / padding", count: 6, total: 48, rate: 12.5 },
+      { key: "negation", label: "Negation reversal", count: 9, total: 48, rate: 18.8 },
+      { key: "synonym", label: "Synonym gap", count: 14, total: 48, rate: 29.2 },
+      { key: "spelling", label: "Spelling corrected", count: 21, total: 48, rate: 43.8 },
+      { key: "sequence", label: "Sequence breakage", count: 7, total: 48, rate: 14.6 },
+      { key: "vision", label: "Diagram unverified", count: 33, total: 48, rate: 68.8 },
+      { key: "density", label: "Low density (fluff)", count: 5, total: 48, rate: 10.4 },
+      { key: "aggregator", label: "Concept missed", count: 24, total: 48, rate: 50 },
+    ],
+  };
+}

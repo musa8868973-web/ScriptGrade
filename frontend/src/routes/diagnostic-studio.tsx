@@ -3,11 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { FileWarning, Image as ImageIcon, Loader2, Save, ScanEye, ScanText } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { LanguageBadge, PaperStatusBadge, SourceBadge } from "@/components/badges";
-import {
-  DEBUGGERS,
-  DebuggerTabContent,
-  toneClasses,
-} from "@/components/debuggers/DebuggerPanel";
+import { DEBUGGERS, DebuggerTabContent, toneClasses } from "@/components/debuggers/DebuggerPanel";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
@@ -56,7 +52,7 @@ function DiagnosticStudio() {
     if (!active && papers.length) setActive(papers[0]!.student_id);
   }, [active, papers]);
 
-  const { data: paper, isLoading } = usePaper(active);
+  const { data: paper, isLoading } = usePaper(active, exam_id);
   const override = useOverride(active ?? "", exam_id);
 
   const [score, setScore] = useState<number | null>(null);
@@ -105,7 +101,7 @@ function DiagnosticStudio() {
                   : "pill-soft hover:text-foreground",
               )}
             >
-              {p.student_id}
+              {p.student_name ?? p.student_id}
             </button>
           ))}
         </div>
@@ -122,6 +118,9 @@ function DiagnosticStudio() {
             <div className="space-y-6 p-4 md:p-6">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="mono-token text-sm font-semibold">{paper.student_id}</span>
+                {paper.student_name && (
+                  <span className="text-sm font-medium text-foreground">{paper.student_name}</span>
+                )}
                 <PaperStatusBadge status={paper.status} />
                 <SourceBadge source={paper.source} />
                 <LanguageBadge language={paper.language} />
@@ -180,7 +179,10 @@ function DiagnosticStudio() {
                 <p
                   dir={isRTL ? "rtl" : "ltr"}
                   lang={paper.language}
-                  className={cn("mt-3 text-sm leading-relaxed", isRTL && "text-right leading-loose")}
+                  className={cn(
+                    "mt-3 text-sm leading-relaxed",
+                    isRTL && "text-right leading-loose",
+                  )}
                 >
                   {paper.ocr_text}
                 </p>

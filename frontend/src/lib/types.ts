@@ -85,6 +85,7 @@ export interface ExamSetupResponse {
 export interface QueuePaper {
   id: string;
   student_id: string;
+  student_name?: string | null;
   source: PaperSource;
   language: LanguageCode;
   status: PaperStatus;
@@ -169,6 +170,7 @@ export interface AggregatorDebug {
 
 export interface PaperDetail {
   student_id: string;
+  student_name?: string | null;
   exam_id: string;
   status: PaperStatus;
   score: number;
@@ -204,3 +206,32 @@ export const LANGUAGE_LABELS: Record<LanguageCode, string> = {
   sd: "سنڌي Sindhi",
   pa: "پنجابی Punjabi",
 };
+
+/* ── Analytics summary (backend GET /analytics/summary) ─────── */
+
+export interface ConceptMasteryStat {
+  concept: string;
+  awarded: number; // class-average marks earned for this question/concept
+  max: number; // the concept's full weight
+  mastery_pct: number; // % of scored papers that earned full marks
+}
+
+export interface DebuggerStat {
+  key: string;
+  label: string;
+  count: number; // papers where the debugger raised its signal
+  total: number; // evaluated papers
+  rate: number; // count / total * 100
+}
+
+export interface AnalyticsSummary {
+  exam_id: string;
+  title: string;
+  total_papers: number;
+  scored_papers: number;
+  max_score: number;
+  class_average: number;
+  score_distribution: number[]; // five percentage bands (0–20 … 80–100)
+  concept_mastery: ConceptMasteryStat[];
+  debugger_breakdown: DebuggerStat[];
+}

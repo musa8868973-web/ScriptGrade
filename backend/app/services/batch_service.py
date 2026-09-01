@@ -5,10 +5,10 @@ Pipeline: multipart PDFs → per-page split → Alibaba Cloud OSS → queued
 """
 
 import logging
-from pathlib import Path
 from uuid import UUID
 
 from fastapi import UploadFile
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -17,11 +17,7 @@ from app.models.exam import Exam, ExamStatus
 from app.models.student_paper import PaperStatus, StudentPaper
 from app.models.user import User
 from app.services.oss_storage import storage_service
-from app.utils.pdf_tools import (
-    detect_student_identifier,
-    is_pdf_content,
-    split_pdf_pages,
-)
+from app.utils.pdf_tools import is_pdf_content, split_pdf_pages
 
 logger = logging.getLogger(__name__)
 
@@ -35,10 +31,12 @@ async def ingest_batch(
     exam: Exam,
     user: User,
     files: list[UploadFile],
-) -> tuple[BatchUpload, list[UUID]]:
+) -> tuple[BatchUpload, list[StudentPaper]]:
     """Persist a batch of scanner PDFs and queue asynchronous evaluation.
 
-    Returns the created batch record and the paper ids dispatched to Celery.
+    Returns the created batch record and the persisted `StudentPaper` rows
+    (each carrying its auto-assigned `STU-2026-NNN` identifier) so the API can
+    surface them to the ingestion UI for immediate name mapping.
     """
     if not files:
         raise BatchIngestionError("At least one scanner PDF must be provided.")
@@ -76,15 +74,24 @@ async def ingest_batch(
     await db.flush()
 
     # 3) Split pages into individual student papers and upload each to OSS.
-    paper_ids: list[UUID] = []
+    #    Auto-assign a stable, human-readable identifier per exam (spec §2a):
+    #    STU-2026-001, STU-2026-002, … continuing past any existing papers.
+    existing = (
+        await db.execute(
+            select(func.count())
+            .select_from(StudentPaper)
+            .where(StudentPaper.exam_id == exam.exam_id)
+        )
+    ).scalar() or 0
+    seq = int(existing)
+
+    created: list[StudentPaper] = []
     global_index = 0
-    for filename, pages in payloads:
-        stem = Path(filename).stem or "batch"
-        for page_index, page_bytes in enumerate(pages):
+    for _filename, pages in payloads:
+        for page_bytes in pages:
             global_index += 1
-            identifier = detect_student_identifier(page_bytes) or (
-                f"{stem}-{global_index:03d}"
-            )
+            seq += 1
+            identifier = f"STU-2026-{seq:03d}"
             key = storage_service.build_key(
                 "papers", exam.exam_id, f"paper_{global_index:03d}.pdf"
             )
@@ -100,13 +107,13 @@ async def ingest_batch(
             )
             db.add(paper)
             await db.flush()
-            paper_ids.append(paper.paper_id)
+            created.append(paper)
 
-    batch.total_papers = len(paper_ids)
+    batch.total_papers = len(created)
     batch.source_url = await _archive_source(exam, payloads)
     exam.status = ExamStatus.processing
     await db.flush()
-    return batch, paper_ids
+    return batch, created
 
 
 def dispatch_evaluation(paper_ids: list[UUID]) -> None:
