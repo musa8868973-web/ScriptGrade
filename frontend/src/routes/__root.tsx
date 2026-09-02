@@ -86,6 +86,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "OCR ingestion, rubric studio, and an auditable 8-debugger grading engine.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "/og-image.png" },
+      { name: "twitter:image", content: "/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [

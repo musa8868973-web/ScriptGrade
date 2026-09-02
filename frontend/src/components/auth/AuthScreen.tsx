@@ -9,7 +9,6 @@ import {
   Loader2,
   Lock,
   Mail,
-  ScanEye,
   ShieldCheck,
   Sparkles,
   User,
@@ -158,7 +157,11 @@ export function AuthScreen({ initialTab = "signin" }: { initialTab?: "signin" | 
         <div className="relative">
           <div className="flex items-center gap-3">
             <div className="grid size-10 place-items-center rounded-md border border-border">
-              <ScanEye size={20} className="text-brand" />
+              <img
+                src="/logo.png"
+                alt="ScriptGrade logo"
+                className="size-6 rounded-[5px]"
+              />
             </div>
             <div>
               <p className="font-display text-lg font-semibold tracking-tight">ScriptGrade</p>

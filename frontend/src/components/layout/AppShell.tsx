@@ -78,7 +78,11 @@ export function AppShell({
         )}
       >
         <div className="flex h-16 items-center gap-2.5 px-5">
-          <ScanEye size={18} className="shrink-0 text-sidebar-foreground" />
+          <img
+            src="/logo.png"
+            alt="ScriptGrade logo"
+            className="size-[18px] shrink-0 rounded-[4px]"
+          />
           {!collapsed && (
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-tight">ScriptGrade</p>
@@ -131,7 +135,7 @@ export function AppShell({
             className="flex items-center gap-2 md:hidden"
             aria-label="ScriptGrade home"
           >
-            <ScanEye size={18} />
+            <img src="/logo.png" alt="" className="size-[18px] rounded-[4px]" />
           </Link>
 
           <span className="hidden items-center gap-1.5 text-[0.6875rem] font-medium tracking-wide text-muted-foreground uppercase sm:inline-flex">
