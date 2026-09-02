@@ -159,13 +159,7 @@ export function AppShell({
           </button>
 
           <div className="flex items-center gap-2.5 border-l border-border pl-3">
-            <div className="grid size-7 place-items-center rounded-full bg-secondary text-[0.625rem] font-semibold text-secondary-foreground">
-              {(teacher?.name ?? "SG")
-                .split(" ")
-                .map((n) => n[0])
-                .slice(0, 2)
-                .join("")}
-            </div>
+            <img src="/logo.png" alt="" className="size-7 rounded-[6px]" />
             <div className="hidden leading-tight lg:block">
               <p className="max-w-[130px] truncate text-xs font-medium">
                 {teacher?.name ?? "Guest"}
