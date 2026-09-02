@@ -4,10 +4,12 @@ Values are sourced from environment variables / a local `.env` file.
 See `backend/.env.example` for the full contract.
 """
 
+import json
 from functools import lru_cache
+from typing import Annotated, Any
 
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -24,7 +26,7 @@ class Settings(BaseSettings):
     project_name: str = "ScriptGrade Backend"
     api_v1_prefix: str = "/api/v1"
     debug: bool = False
-    cors_origins: list[str] = Field(
+    cors_origins: Annotated[list[str], NoDecode] = Field(
         default=["http://localhost:3000", "http://127.0.0.1:3000"],
     )
 
@@ -64,6 +66,34 @@ class Settings(BaseSettings):
     max_upload_bytes: int = 50 * 1024 * 1024  # 50 MB per file
     max_batch_files: int = 200
     minutes_per_paper_manual: float = 6.0  # used for the "hours saved" metric
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def _parse_cors_origins(cls, value: Any) -> Any:
+        """Accept ``CORS_ORIGINS`` as a JSON array *or* a comma-separated list.
+
+        Managed platforms (Railway, Vercel) make an escaped JSON array awkward
+        to set, so a plain CSV is also honoured. Both of these are equivalent::
+
+            CORS_ORIGINS=["https://app.example","https://staging.example"]
+            CORS_ORIGINS=https://app.example,https://staging.example
+
+        Blank entries are dropped; a non-string (e.g. the default list) is
+        passed through untouched so local `.env` files keep working verbatim.
+        """
+        if not isinstance(value, str):
+            return value
+        raw = value.strip()
+        if not raw:
+            return []
+        if raw.startswith("["):
+            try:
+                decoded = json.loads(raw)
+            except json.JSONDecodeError:
+                decoded = None
+            if isinstance(decoded, list):
+                return [str(origin).strip() for origin in decoded if str(origin).strip()]
+        return [origin.strip() for origin in raw.split(",") if origin.strip()]
 
     @property
     def sync_database_url(self) -> str:

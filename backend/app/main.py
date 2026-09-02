@@ -5,6 +5,7 @@ the Next.js frontend to AnalyticDB for PostgreSQL, Alibaba Cloud OSS, the
 Celery/Redis ingestion queue and the Qwen-2.5 / Qwen-VL AI layer.
 """
 
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -51,3 +52,12 @@ app.include_router(api_router, prefix=settings.api_v1_prefix)
 async def healthcheck() -> dict[str, str]:
     """Liveness probe used by ECS/container health checks."""
     return {"status": "healthy", "service": "scriptgrade-backend", "version": app.version}
+
+
+if __name__ == "__main__":
+    # Direct-execution entry point for PaaS/container runtimes (Railway injects
+    # PORT). Binds 0.0.0.0 so the platform router can reach it and falls back to
+    # 8000 for local `python -m app.main` runs.
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "8000")), reload=False)
