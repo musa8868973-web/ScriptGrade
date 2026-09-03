@@ -27,7 +27,15 @@ class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
     debug: bool = False
     cors_origins: Annotated[list[str], NoDecode] = Field(
-        default=["http://localhost:3000", "http://127.0.0.1:3000"],
+        default=[
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            # Deployed Vercel frontend — required even when CORS_ORIGINS is unset
+            # on the host, otherwise the browser blocks every preflighted POST.
+            "https://script-grade-kpqa2c2zp-musa8868973-1297s-projects.vercel.app",
+        ],
     )
 
     # --- AnalyticDB for PostgreSQL (async driver for the FastAPI gateway) ---

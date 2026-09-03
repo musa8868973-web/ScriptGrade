@@ -14,8 +14,10 @@ import type {
   Teacher,
 } from "./types";
 
-export const API_BASE_URL =
-  (import.meta.env["VITE_API_BASE_URL"] as string | undefined) ?? "http://localhost:8000/api/v1";
+export const API_BASE_URL = (
+  ((import.meta.env["VITE_API_BASE_URL"] as string | undefined) ?? "http://localhost:8000/api/v1")
+).replace(/\/+$/, ""); // strip trailing slashes — request paths all start with "/", so a
+// trailing slash in the env var would produce "//auth/login" → 404.
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
