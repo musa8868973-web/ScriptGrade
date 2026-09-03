@@ -57,17 +57,18 @@ export function useExams() {
 }
 
 export function usePaperQueue(examId: string) {
-  return useQuery<PaperQueueResponse>({
+  return useQuery<PaperQueueResponse & { demo: boolean }>({
     queryKey: queryKeys.paperQueue(examId),
     queryFn: async () => {
       try {
         const res = await paperApi.queue(examId);
-        return res.data;
+        return { ...res.data, demo: false };
       } catch (error) {
         // `/papers/queue` is the Frontend PRD §5.3 polling contract; the local
         // backend build does not implement it (Backend PRD §8.7) → 404 renders
         // demo fixtures so the queue UI stays stable.
-        if (isUnavailable(error)) return { ...demoQueue, exam_id: examId || DEMO_EXAM_ID };
+        if (isUnavailable(error))
+          return { ...demoQueue, exam_id: examId || DEMO_EXAM_ID, demo: true };
         throw error;
       }
     },
@@ -154,25 +155,38 @@ export function useBatchUpload(examId: string, onProgress?: (pct: number) => voi
 /** Persist the teacher's ID↔name mapping for one auto-assigned paper. */
 export function useSetStudentName(examId: string) {
   const queryClient = useQueryClient();
+  const queueKey = queryKeys.paperQueue(examId);
   return useMutation({
     mutationFn: async ({ studentId, name }: { studentId: string; name: string }) => {
-      try {
-        const res = await paperApi.setIdentity(studentId, name, examId);
-        return res.data;
-      } catch (error) {
-        if (isOffline(error)) {
-          return {
-            status: "identity_saved",
-            paper_id: studentId,
-            student_id: studentId,
-            student_name: name,
-          };
-        }
-        throw error;
+      // Never fake success here: a failed write must surface so the teacher
+      // knows the mapping was not persisted (demo fixtures swallow nothing).
+      const res = await paperApi.setIdentity(studentId, name, examId);
+      return res.data;
+    },
+    onMutate: async ({ studentId, name }) => {
+      // Optimistically show the name in the queue row; rolled back on error.
+      await queryClient.cancelQueries({ queryKey: queueKey });
+      const previous = queryClient.getQueryData<PaperQueueResponse & { demo: boolean }>(queueKey);
+      if (previous) {
+        queryClient.setQueryData<PaperQueueResponse & { demo: boolean }>(queueKey, {
+          ...previous,
+          papers: previous.papers.map((p) =>
+            p.student_id === studentId || p.id === studentId ? { ...p, student_name: name } : p,
+          ),
+        });
       }
+      return { previous };
+    },
+    onError: (error, { studentId }, context) => {
+      if (context?.previous) queryClient.setQueryData(queueKey, context.previous);
+      toast.error("Student name not saved", {
+        description: isOffline(error)
+          ? "Backend unreachable — nothing was persisted. Check VITE_API_BASE_URL / start the API."
+          : `Could not update ${studentId}. Please retry.`,
+      });
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.paperQueue(examId) });
+      queryClient.invalidateQueries({ queryKey: queueKey });
       queryClient.invalidateQueries({ queryKey: queryKeys.paper(variables.studentId, examId) });
     },
   });

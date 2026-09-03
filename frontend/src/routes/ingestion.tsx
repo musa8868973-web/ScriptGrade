@@ -28,6 +28,7 @@ import {
   useSetStudentName,
 } from "@/lib/queries";
 import { DEMO_EXAM_ID } from "@/lib/demo-data";
+import { API_BASE_URL } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
@@ -614,6 +615,13 @@ function IngestionPage() {
           <span className="text-vision">{stats.processing} OCR active</span>
           <span className="text-pass">{stats.done} evaluated</span>
         </div>
+
+        {queue?.demo && (
+          <p className="mono-token mt-3 border-l-2 border-warn pl-3 text-xs text-warn">
+            Demo fixtures — backend unreachable at {API_BASE_URL}. Name edits against STU-1xx
+            sample rows are not persisted; point VITE_API_BASE_URL at the live FastAPI backend.
+          </p>
+        )}
 
         <div className="mt-3 max-h-[420px] overflow-y-auto">
           <table className="w-full min-w-[620px] text-left text-sm">
