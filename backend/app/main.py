@@ -58,6 +58,14 @@ async def healthcheck() -> dict[str, str]:
     return {"status": "healthy", "service": "scriptgrade-backend", "version": app.version}
 
 
+@app.get(f"{settings.api_v1_prefix}/health", tags=["infra"])
+async def healthcheck_v1() -> dict[str, str]:
+    """Versioned alias so probes pinned to the /api/v1 prefix (e.g. frontend
+    connectivity checks built on API_BASE_URL) also resolve — the canonical
+    Railway healthcheckPath remains the root-level /health."""
+    return {"status": "healthy", "service": "scriptgrade-backend", "version": app.version}
+
+
 if __name__ == "__main__":
     # Direct-execution entry point for PaaS/container runtimes (Railway injects
     # PORT). Binds 0.0.0.0 so the platform router can reach it and falls back to
