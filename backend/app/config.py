@@ -27,15 +27,12 @@ class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
     debug: bool = False
     cors_origins: Annotated[list[str], NoDecode] = Field(
-        default=[
-            "http://localhost:3000",
-            "http://127.0.0.1:3000",
-            "http://localhost:5173",
-            "http://127.0.0.1:5173",
-            # Deployed Vercel frontend — required even when CORS_ORIGINS is unset
-            # on the host, otherwise the browser blocks every preflighted POST.
-            "https://script-grade-kpqa2c2zp-musa8868973-1297s-projects.vercel.app",
-        ],
+        # Wildcard by default: the Vercel frontend's preview origin rotates per
+        # deployment, so any strict list eventually blocks it. Starlette pairs
+        # "*" with allow_credentials by mirroring the request Origin on
+        # preflights (spec-compliant). Set CORS_ORIGINS to an explicit CSV/JSON
+        # list to lock this down later without a code change.
+        default=["*"],
     )
 
     # --- AnalyticDB for PostgreSQL (async driver for the FastAPI gateway) ---

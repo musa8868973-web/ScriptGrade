@@ -39,10 +39,13 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
+    # Defaults to ["*"] (see config.cors_origins): with allow_credentials,
+    # Starlette mirrors the request Origin on preflights, so every origin —
+    # including rotating Vercel preview subdomains — passes OPTIONS without a
+    # strict allowlist. Set the CORS_ORIGINS env var to pin explicit origins.
     allow_origins=settings.cors_origins,
-    # Vercel mints a new preview origin per deployment (<hash>-<project>.vercel.app),
-    # so the frontend's exact subdomain rotates; allow any vercel.app deployment
-    # in addition to the explicit origins above.
+    # Belt-and-braces: even if CORS_ORIGINS is pinned to a strict list, Vercel
+    # preview deployments (https://<hash>-<project>.vercel.app) stay allowed.
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
