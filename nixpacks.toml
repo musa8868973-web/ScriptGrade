@@ -1,0 +1,37 @@
+# Root-level Nixpacks plan for the ScriptGrade backend.
+#
+# This file is active ONLY when the Railway service Root Directory is the
+# repo root. When Root Directory = backend/ (the primary setup), Railway
+# reads backend/nixpacks.toml instead and this file is ignored. Both copies
+# are kept deliberately so the build works regardless of that dashboard
+# setting — paths here are relative to the REPO ROOT.
+#
+# Note: Nixpacks declares providers as a top-level array (no [providers]
+# table exists in the schema).
+
+# Force the Python provider; '...' keeps any other auto-detected providers.
+providers = ['...', 'python']
+
+[variables]
+# backend/requirements.txt targets Python 3.11+.
+NIXPACKS_PYTHON_VERSION = '3.11'
+# Installation is done in the build phase below, so keep the provider's own
+# auto-install disabled.
+NIXPACKS_PYTHON_PACKAGE_MANAGER = 'skip'
+
+[phases.setup]
+# Provision pip explicitly: the nixpkgs Python derivation ships WITHOUT pip,
+# which is why builds died with "pip: command not found" / "No module named
+# pip". Pinned to python311 to mirror NIXPACKS_PYTHON_VERSION.
+nixPkgs = ['python311', 'python311Packages.pip']
+
+[phases.build]
+# Run after 'setup' (which provisions Python + pip on PATH).
+dependsOn = ['setup']
+cmds = ['python -m pip install -r backend/requirements.txt']
+
+[start]
+# $PORT is injected by Railway at runtime. CWD is the repo root here, so
+# uvicorn needs --app-dir backend to import the app package (mirrors the
+# root railway.json startCommand; the backend/ copy must NOT use --app-dir).
+cmd = 'uvicorn app.main:app --host 0.0.0.0 --port $PORT --app-dir backend'
