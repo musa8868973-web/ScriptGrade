@@ -72,6 +72,15 @@ export const isOffline = (error: unknown) =>
 export const isUnavailable = (error: unknown) =>
   isOffline(error) || (axios.isAxiosError(error) && error.response?.status === 404);
 
+/**
+ * True for a canonical 8-4-4-4-12 UUID. The backend types `exam_id` as `UUID`,
+ * so sending a non-UUID (e.g. the `exam_bio101` demo placeholder) as the query
+ * string yields a 422 validation error rather than data — callers guard with
+ * this and fall back to demo fixtures instead of hitting the endpoint.
+ */
+export const isUuid = (value: string): boolean =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+
 /* ────────────────────────────────────────────────────────────────────────────
  * Backend wire contracts — response shapes exactly as served by FastAPI
  * (Backend PRD §8 endpoint table and §13 8-debugger diagnostic JSONB).
@@ -223,6 +232,9 @@ interface BackendPaperDetailResponse {
   status: string;
   ocr_confidence: number | null;
   ocr_transcript: string | null;
+  /** Scanned answer-sheet source (StudentPaper.scanned_image_url); may be a
+   * relative backend path (/static/…, /uploads/…) or an absolute OSS/S3 URL. */
+  scanned_image_url?: string | null;
   word_count: number | null;
   evaluated_at: string | null;
   is_flagged: boolean;
@@ -469,7 +481,7 @@ const mapPaperDetail = (d: BackendPaperDetailResponse): PaperDetail => {
     density_ratio: debuggers.density.density_ratio,
     language: "en",
     source: "web_dashboard",
-    scan_url: "", // backend PRD §8.5 has no scan URL — offline viewer placeholder
+    scan_url: str(d.scanned_image_url), // scanned-sheet source (relative or absolute)
     ocr_text: d.ocr_transcript ?? "",
     moderation_note: d.teacher_override?.moderation_note ?? null,
     debuggers,

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
-import { analyticsApi, examApi, isOffline, isUnavailable, paperApi } from "./api";
+import { analyticsApi, examApi, isOffline, isUnavailable, isUuid, paperApi } from "./api";
 import {
   demoAnalyticsSummary,
   demoExamsResponse,
@@ -60,6 +60,11 @@ export function usePaperQueue(examId: string) {
   return useQuery<PaperQueueResponse & { demo: boolean }>({
     queryKey: queryKeys.paperQueue(examId),
     queryFn: async () => {
+      // Backend types `exam_id` as UUID — a non-UUID placeholder (exam_bio101)
+      // would 422, which `isUnavailable` does not catch. Skip the request and
+      // render demo fixtures instead of erroring the whole studio.
+      if (!isUuid(examId))
+        return { ...demoQueue, exam_id: examId || DEMO_EXAM_ID, demo: true };
       try {
         const res = await paperApi.queue(examId);
         return { ...res.data, demo: false };
@@ -87,6 +92,9 @@ export function usePaper(studentId: string | null, examId?: string) {
     queryKey: queryKeys.paper(studentId ?? "none", examId),
     enabled: Boolean(studentId),
     queryFn: async () => {
+      // A non-UUID `exam_id` placeholder would 422 against the backend's
+      // UUID-typed query param — render the demo paper instead of erroring.
+      if (examId && !isUuid(examId)) return demoPaperDetail(studentId!);
       try {
         const res = await paperApi.detail(studentId!, examId);
         return res.data;

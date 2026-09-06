@@ -8,6 +8,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { usePaper, usePaperQueue, useOverride } from "@/lib/queries";
+import { API_BASE_URL } from "@/lib/api";
 import { DEMO_EXAM_ID } from "@/lib/demo-data";
 import { LANGUAGE_LABELS, RTL_LANGUAGES, type LanguageCode } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -66,11 +67,15 @@ function DiagnosticStudio() {
 
   const isRTL = paper ? RTL_LANGUAGES.includes(paper.language) : false;
 
-  // Resolve the scanned-sheet source by priority, then accept ONLY absolute
-  // backend/S3 (http/https) or Blob object URLs. Empty strings and relative
-  // paths (e.g. "/") are rejected so the <iframe> never embeds the app itself.
+  // Resolve the scanned-sheet source by priority. A relative backend path
+  // (/static/…, /uploads/…) is resolved against the API origin so the
+  // absolute-URL guard accepts it; empty strings and other non-absolute values
+  // are still rejected so the <iframe> never embeds the app itself.
   const rawPaperUrl = paper?.file_url || paper?.scan_url || paper?.pdf_url || "";
-  const paperUrl = /^(https?:|blob:)/i.test(rawPaperUrl) ? rawPaperUrl : "";
+  const resolvedPaperUrl = rawPaperUrl.startsWith("/")
+    ? `${new URL(API_BASE_URL).origin}${rawPaperUrl}`
+    : rawPaperUrl;
+  const paperUrl = /^(https?:|blob:)/i.test(resolvedPaperUrl) ? resolvedPaperUrl : "";
   const hasPreview = paperUrl.length > 0;
   const paperIsImage = /\.(jpe?g|png)(\?|#|$)/i.test(paperUrl);
 
