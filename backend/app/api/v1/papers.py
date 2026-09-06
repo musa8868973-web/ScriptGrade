@@ -210,6 +210,7 @@ async def get_paper_detail(
         status=paper.status.value,
         ocr_confidence=paper.ocr_confidence,
         ocr_transcript=paper.ocr_transcript,
+        scanned_image_url=paper.scanned_image_url,
         word_count=paper.word_count,
         evaluated_at=paper.evaluated_at,
         is_flagged=paper.is_flagged,

@@ -60,6 +60,7 @@ class PaperDetailResponse(BaseModel):
     status: str
     ocr_confidence: float | None
     ocr_transcript: str | None
+    scanned_image_url: str | None = None
     word_count: int | None
     evaluated_at: datetime | None
     is_flagged: bool
