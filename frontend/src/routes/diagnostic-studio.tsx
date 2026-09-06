@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { FileWarning, Image as ImageIcon, Loader2, Save, ScanEye, ScanText } from "lucide-react";
+import { Image as ImageIcon, Loader2, Save, ScanEye, ScanText } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { LanguageBadge, PaperStatusBadge, SourceBadge } from "@/components/badges";
 import { DEBUGGERS, DebuggerTabContent, toneClasses } from "@/components/debuggers/DebuggerPanel";
@@ -66,6 +66,11 @@ function DiagnosticStudio() {
 
   const isRTL = paper ? RTL_LANGUAGES.includes(paper.language) : false;
 
+  // Active paper's scanned-sheet source (PDF or image). JPG/PNG render as a
+  // native <img>; anything else (PDF) renders in the embedded <iframe> viewer.
+  const paperUrl = paper?.scan_url ?? "";
+  const paperIsImage = /\.(jpe?g|png)(\?|#|$)/i.test(paperUrl);
+
   return (
     <AppShell
       padded={false}
@@ -115,7 +120,7 @@ function DiagnosticStudio() {
         <ResizablePanelGroup className="min-h-[70vh] items-stretch border-t border-border">
           {/* ── Left: scanned paper ─────────────────────────── */}
           <ResizablePanel defaultSize={42} minSize={26}>
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="h-full space-y-6 overflow-y-auto p-4 md:p-6">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="mono-token text-sm font-semibold">{paper.student_id}</span>
                 {paper.student_name && (
@@ -133,42 +138,20 @@ function DiagnosticStudio() {
                     OCR confidence {paper.ocr_confidence.toFixed(1)}%
                   </span>
                 </div>
-                {paper.scan_url ? (
-                  <img
-                    src={paper.scan_url}
-                    alt={`Scanned answer sheet for ${paper.student_id}`}
-                    className="mt-3 w-full rounded-md border border-border"
-                  />
-                ) : (
-                  <div className="relative mt-3 aspect-[3/4] w-full rounded-md border border-border bg-card">
-                    <div className="absolute inset-0 grid place-items-center text-center text-xs text-muted-foreground">
-                      <div className="flex flex-col items-center gap-2">
-                        <FileWarning size={18} />
-                        Scan preview unavailable offline — OCR transcript shown below.
-                      </div>
-                    </div>
-                    {paper.debuggers.vision.detected_elements.map((el) => {
-                      const { image_width: w, image_height: h } = paper.debuggers.vision;
-                      const [x1, y1, x2, y2] = el.bbox;
-                      return (
-                        <div
-                          key={el.label}
-                          title={`${el.label} — ${el.confidence}%`}
-                          className="absolute rounded-sm border border-vision/60"
-                          style={{
-                            left: `${(x1 / w) * 100}%`,
-                            top: `${(y1 / h) * 100}%`,
-                            width: `${((x2 - x1) / w) * 100}%`,
-                            height: `${((y2 - y1) / h) * 100}%`,
-                          }}
-                        >
-                          <span className="mono-token absolute -top-4 left-0 text-[0.5625rem] text-vision">
-                            {el.label}
-                          </span>
-                        </div>
-                      );
-                    })}
+                {paperIsImage ? (
+                  <div className="mt-3 overflow-y-auto rounded-lg border border-slate-200">
+                    <img
+                      src={paperUrl}
+                      alt={`Scanned answer sheet for ${paper.student_id}`}
+                      className="w-full"
+                    />
                   </div>
+                ) : (
+                  <iframe
+                    src={`${paperUrl}#toolbar=0&navpanes=0`}
+                    className="w-full h-[600px] rounded-lg border border-slate-200"
+                    title="Answer Sheet Preview"
+                  />
                 )}
               </div>
 
