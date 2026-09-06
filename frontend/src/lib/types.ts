@@ -181,6 +181,9 @@ export interface PaperDetail {
   language: LanguageCode;
   source: PaperSource;
   scan_url: string;
+  /** Optional absolute document sources used by the Diagnostic Studio viewer. */
+  file_url?: string | null;
+  pdf_url?: string | null;
   ocr_text: string;
   moderation_note?: string | null;
   debuggers: {

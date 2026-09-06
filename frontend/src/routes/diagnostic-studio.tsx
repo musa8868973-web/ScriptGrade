@@ -66,9 +66,12 @@ function DiagnosticStudio() {
 
   const isRTL = paper ? RTL_LANGUAGES.includes(paper.language) : false;
 
-  // Active paper's scanned-sheet source (PDF or image). JPG/PNG render as a
-  // native <img>; anything else (PDF) renders in the embedded <iframe> viewer.
-  const paperUrl = paper?.scan_url ?? "";
+  // Resolve the scanned-sheet source by priority, then accept ONLY absolute
+  // backend/S3 (http/https) or Blob object URLs. Empty strings and relative
+  // paths (e.g. "/") are rejected so the <iframe> never embeds the app itself.
+  const rawPaperUrl = paper?.file_url || paper?.scan_url || paper?.pdf_url || "";
+  const paperUrl = /^(https?:|blob:)/i.test(rawPaperUrl) ? rawPaperUrl : "";
+  const hasPreview = paperUrl.length > 0;
   const paperIsImage = /\.(jpe?g|png)(\?|#|$)/i.test(paperUrl);
 
   return (
@@ -138,7 +141,11 @@ function DiagnosticStudio() {
                     OCR confidence {paper.ocr_confidence.toFixed(1)}%
                   </span>
                 </div>
-                {paperIsImage ? (
+                {!hasPreview ? (
+                  <p className="mt-3 rounded-lg border border-border bg-card px-4 py-10 text-center text-xs text-muted-foreground">
+                    No document preview available for this scan.
+                  </p>
+                ) : paperIsImage ? (
                   <div className="mt-3 overflow-y-auto rounded-lg border border-slate-200">
                     <img
                       src={paperUrl}
