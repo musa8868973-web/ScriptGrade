@@ -100,14 +100,29 @@ async def _resolve_paper(
     summary="Bulk scanner upload → OSS → async Celery evaluation",
 )
 async def batch_upload(
-    exam_id: UUID = Form(...),
+    exam_id: str = Form(...),
     batch_pdf_file: UploadFile | None = File(default=None),
     files: list[UploadFile] = File(default=[]),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> BatchUploadResponse:
     """Accept ADF scanner PDFs and queue asynchronous OCR + grading."""
-    exam = await get_owned_exam(db, exam_id, current_user)
+    # Accept exam_id as a raw string and convert it explicitly so a non-UUID
+    # value (e.g. the frontend demo slug "exam_bio101" sent when /ingestion is
+    # opened without a real exam) yields a clear, actionable error instead of an
+    # opaque FastAPI request-validation failure at the multipart form boundary.
+    try:
+        exam_uuid = UUID(exam_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"exam_id must be a valid exam UUID; received {exam_id!r}. "
+                "Open Answer Sheet Ingestion from a created exam before uploading."
+            ),
+        ) from None
+
+    exam = await get_owned_exam(db, exam_uuid, current_user)
 
     uploads: list[UploadFile] = [f for f in (batch_pdf_file, *files) if f is not None]
     if not uploads:
