@@ -43,17 +43,17 @@
 
 | Page 1 — Auth & Login | Page 2 — Exam Hub Dashboard |
 |:---:|:---:|
-| ![Login](https://via.placeholder.com/600x380/4F46E5/FFFFFF?text=Page+1%3A+Auth+%2F+Login) | ![Dashboard](https://via.placeholder.com/600x380/4F46E5/FFFFFF?text=Page+2%3A+Exam+Hub+Dashboard) |
+| ![Login](./docs/login.png) | ![Dashboard](./docs/dashboard.png) |
 
 | Page 3 — AI Rubric Studio | Page 4 — Dual Ingestion Portal |
 |:---:|:---:|
-| ![Rubric](https://via.placeholder.com/600x380/FF6A00/FFFFFF?text=Page+3%3A+AI+Rubric+Studio) | ![Upload](https://via.placeholder.com/600x380/FF6A00/FFFFFF?text=Page+4%3A+Dual+Ingestion+Portal) |
+| ![Rubric](./docs/rubrics.png) | ![Upload](./docs/upload.png) |
 
 | Page 5 — Master Grading & 8-Debugger Diagnostic Workspace |
 |:---:|
-| ![Workspace](https://via.placeholder.com/1200x480/2496ED/FFFFFF?text=Page+5%3A+Master+Grading+%26+8-Debugger+Diagnostic+Workspace) |
+| ![Workspace](./docs/workspace.png) |
 
-> 🔁 *Replace placeholders with real screenshots or a GIF walkthrough before submission.*
+> *Live product screenshots — login, exam dashboard, AI rubric studio, dual ingestion portal, and the 8-debugger diagnostic workspace.*
 
 </div>
 
