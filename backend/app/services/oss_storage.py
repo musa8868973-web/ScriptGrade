@@ -73,8 +73,9 @@ class ObjectStorageService:
 
     async def get_object(self, url: str) -> bytes:
         """Download an object by its stored URL (OSS or local fallback)."""
-        if url.startswith("local://"):
-            return self._get_local(url)
+        local_key = self._local_key(url)
+        if local_key is not None:
+            return self._get_local(local_key)
         key = self._key_from_url(url)
         if not self._configured or key is None:
             raise StorageError(f"Cannot resolve object for URL: {url}")
@@ -94,9 +95,9 @@ class ObjectStorageService:
 
     async def delete_object(self, url: str) -> None:
         """Best-effort object deletion (used by moderation cleanups)."""
-        if url.startswith("local://"):
-            path = self._local_root / url[len("local://"):]
-            path.unlink(missing_ok=True)
+        local_key = self._local_key(url)
+        if local_key is not None:
+            (self._local_root / local_key).unlink(missing_ok=True)
             return
         key = self._key_from_url(url)
         if not self._configured or key is None:
@@ -150,16 +151,30 @@ class ObjectStorageService:
 
     # ------------------------------------------------------ local fallback
 
+    def _local_key(self, url: str) -> str | None:
+        """Strip a local-fallback prefix → on-disk key, or None if not local.
+
+        Handles the web-relative ``/static/<key>`` path the browser loads
+        (served by the StaticFiles mount in ``app.main``) and the legacy
+        ``local://<key>`` scheme written before static serving existed.
+        """
+        for prefix in ("/static/", "local://"):
+            if url.startswith(prefix):
+                return url[len(prefix):]
+        return None
+
     def _put_local(self, key: str, data: bytes) -> str:
         path = self._local_root / key
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
-        return f"local://{key}"
+        # Relative path under the /static mount so the frontend viewer can load
+        # it directly; the OCR worker resolves it back via _local_key.
+        return f"/static/{key}"
 
-    def _get_local(self, url: str) -> bytes:
-        path = self._local_root / url[len("local://"):]
+    def _get_local(self, key: str) -> bytes:
+        path = self._local_root / key
         if not path.exists():
-            raise StorageError(f"Local object missing: {url}")
+            raise StorageError(f"Local object missing: {key}")
         return path.read_bytes()
 
 

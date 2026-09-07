@@ -8,9 +8,11 @@ Celery/Redis ingestion queue and the Qwen-2.5 / Qwen-VL AI layer.
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.v1 import api_router
 from app.config import settings
@@ -53,6 +55,15 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix=settings.api_v1_prefix)
+
+# Serve locally-stored scans when OSS is not configured: the ingestion
+# fallback persists files under LOCAL_STORAGE_DIR and stores the web-relative
+# "/static/<key>" path in StudentPaper.scanned_image_url, which the frontend
+# Diagnostic Studio viewer loads directly. On Railway, point LOCAL_STORAGE_DIR
+# at a mounted volume so uploads survive redeploys.
+_local_storage = Path(settings.local_storage_dir).resolve()
+_local_storage.mkdir(parents=True, exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(_local_storage)), name="static")
 
 
 @app.get("/health", tags=["infra"])
