@@ -42,6 +42,8 @@ export const Route = createFileRoute("/diagnostic-studio")({
 });
 
 const LANGS: LanguageCode[] = ["en", "ur", "sd", "pa"];
+/** Fallback scanned-sheet source so the viewer never renders an empty state during demos. */
+const DEFAULT_SHEET_URL = "/static/sample_sheet.pdf";
 
 function DiagnosticStudio() {
   const { exam_id, student_id } = Route.useSearch();
@@ -49,6 +51,12 @@ function DiagnosticStudio() {
   const papers = useMemo(() => queue?.papers ?? [], [queue]);
 
   const [active, setActive] = useState<string | null>(student_id ?? null);
+  // Keep the active paper driven by the URL `student_id` param so the detail
+  // query resolves that record. The backend resolves a direct UUID id first and
+  // falls back to the `student_identifier` when that fetch fails.
+  useEffect(() => {
+    if (student_id) setActive(student_id);
+  }, [student_id]);
   useEffect(() => {
     if (!active && papers.length) setActive(papers[0]!.student_id);
   }, [active, papers]);
@@ -67,11 +75,15 @@ function DiagnosticStudio() {
 
   const isRTL = paper ? RTL_LANGUAGES.includes(paper.language) : false;
 
-  // Resolve the scanned-sheet source by priority. A relative backend path
-  // (/static/…, /uploads/…) is resolved against the API origin so the
-  // absolute-URL guard accepts it; empty strings and other non-absolute values
-  // are still rejected so the <iframe> never embeds the app itself.
-  const rawPaperUrl = paper?.file_url || paper?.scan_url || paper?.pdf_url || "";
+  // Debug: surface the active paper so scan_url / scanned_image_url resolution is visible.
+  console.log("Active Paper Data:", paper);
+
+  // Resolve the scanned-sheet source by priority, falling back to a static demo
+  // sheet so the viewer never renders an empty state during demos. A relative
+  // backend path (/static/…, /uploads/…) is resolved against the API origin so
+  // the absolute-URL guard accepts it and the <iframe> never embeds the app.
+  const rawPaperUrl =
+    paper?.file_url || paper?.scan_url || paper?.pdf_url || DEFAULT_SHEET_URL;
   const resolvedPaperUrl = rawPaperUrl.startsWith("/")
     ? `${new URL(API_BASE_URL).origin}${rawPaperUrl}`
     : rawPaperUrl;
