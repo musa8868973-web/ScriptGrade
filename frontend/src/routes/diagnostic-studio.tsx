@@ -4,7 +4,6 @@ import { Image as ImageIcon, Loader2, Save, ScanEye, ScanText } from "lucide-rea
 import { AppShell } from "@/components/layout/AppShell";
 import { LanguageBadge, PaperStatusBadge, SourceBadge } from "@/components/badges";
 import { DEBUGGERS, DebuggerTabContent, toneClasses } from "@/components/debuggers/DebuggerPanel";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { usePaper, usePaperQueue, useOverride } from "@/lib/queries";
@@ -147,9 +146,9 @@ function DiagnosticStudio() {
           <Loader2 size={16} className="animate-spin" /> Loading debugger payload…
         </div>
       ) : (
-        <ResizablePanelGroup className="min-h-[70vh] items-stretch border-t border-border">
+        <div className="grid min-h-[70vh] grid-cols-1 gap-4 border-t border-border lg:grid-cols-12">
           {/* ── Left: scanned paper ─────────────────────────── */}
-          <ResizablePanel defaultSize={42} minSize={26}>
+          <div className="col-span-12 lg:col-span-5">
             <div className="h-full space-y-6 overflow-y-auto p-4 md:p-6">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="mono-token text-sm font-semibold">{paper.student_id}</span>
@@ -181,11 +180,13 @@ function DiagnosticStudio() {
                     />
                   </div>
                 ) : (
-                  <iframe
-                    src={`${paperUrl}#toolbar=0&navpanes=0`}
-                    className="w-full h-[600px] rounded-lg border border-slate-200"
-                    title="Answer Sheet Preview"
-                  />
+                  <div className="mt-3 h-[600px] w-full overflow-hidden rounded-lg border border-slate-200">
+                    <iframe
+                      src={`${paperUrl}#toolbar=0&navpanes=0`}
+                      className="block h-full w-full border-0"
+                      title="Answer Sheet Preview"
+                    />
+                  </div>
                 )}
               </div>
 
@@ -209,12 +210,10 @@ function DiagnosticStudio() {
                 </div>
               </div>
             </div>
-          </ResizablePanel>
-
-          <ResizableHandle withHandle />
+          </div>
 
           {/* ── Right: 8-debugger inline list ───────────────── */}
-          <ResizablePanel defaultSize={58} minSize={34}>
+          <div className="col-span-12 lg:col-span-7">
             <div className="space-y-8 p-4 md:p-6">
               <div>
                 <div className="section-title">
@@ -299,8 +298,8 @@ function DiagnosticStudio() {
                 </button>
               </section>
             </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+          </div>
+        </div>
       )}
     </AppShell>
   );
