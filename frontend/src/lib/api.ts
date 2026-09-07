@@ -482,6 +482,7 @@ const mapPaperDetail = (d: BackendPaperDetailResponse): PaperDetail => {
     language: "en",
     source: "web_dashboard",
     scan_url: str(d.scanned_image_url), // scanned-sheet source (relative or absolute)
+    scanned_image_url: d.scanned_image_url ?? null, // raw backend field for explicit viewer inspection
     ocr_text: d.ocr_transcript ?? "",
     moderation_note: d.teacher_override?.moderation_note ?? null,
     debuggers,

@@ -181,6 +181,10 @@ export interface PaperDetail {
   language: LanguageCode;
   source: PaperSource;
   scan_url: string;
+  /** Raw backend scanned-sheet source (StudentPaper.scanned_image_url): a relative
+   * path (/static/..., /uploads/...) or an absolute OSS/S3 URL. Carried alongside
+   * the canonical `scan_url` so the viewer can inspect the original uploaded doc. */
+  scanned_image_url?: string | null;
   /** Optional absolute document sources used by the Diagnostic Studio viewer. */
   file_url?: string | null;
   pdf_url?: string | null;

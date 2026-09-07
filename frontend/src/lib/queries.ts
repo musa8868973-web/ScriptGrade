@@ -91,6 +91,12 @@ export function usePaper(studentId: string | null, examId?: string) {
   return useQuery<PaperDetail>({
     queryKey: queryKeys.paper(studentId ?? "none", examId),
     enabled: Boolean(studentId),
+    // Force a fresh backend fetch on every mount and on any active/exam param
+    // change, so paper data ingested moments ago is never shadowed by a cached
+    // (or demo-fallback) payload. `staleTime: 0` marks data immediately stale;
+    // `refetchOnMount: "always"` refetches even when a fresh cache entry exists.
+    staleTime: 0,
+    refetchOnMount: "always",
     queryFn: async () => {
       // A non-UUID `exam_id` placeholder would 422 against the backend's
       // UUID-typed query param — render the demo paper instead of erroring.

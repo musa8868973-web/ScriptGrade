@@ -91,7 +91,9 @@ function DiagnosticStudio() {
   // every other case — no paper URL, or an empty/invalid backend origin (e.g.
   // missing env vars) — use PUBLIC_FALLBACK_PDF, so the <iframe> src is always
   // a guaranteed-valid absolute URL and a 404 is impossible.
-  const rawPaperUrl = paper?.file_url || paper?.scan_url || paper?.pdf_url || "";
+  // Priority: raw backend scanned_image_url, then canonical scan_url, then file_url, then pdf_url.
+  const rawPaperUrl =
+    paper?.scanned_image_url || paper?.scan_url || paper?.file_url || paper?.pdf_url || "";
   const paperUrl = /^https?:\/\//i.test(rawPaperUrl)
     ? rawPaperUrl
     : rawPaperUrl.startsWith("/") && HAS_BACKEND_ORIGIN
