@@ -92,6 +92,15 @@ def process_paper_task(self, paper_id: str) -> dict[str, str]:
         session.flush()
 
         try:
+            # scanned_image_url is a nullable column set at ingestion; guard it so
+            # OCR degrades gracefully (clear diagnostic via the except below)
+            # instead of crashing inside get_object. OCR only ever READS this
+            # field -- it never rewrites or clears it -- so a failed or 0-text
+            # extraction still leaves the original document renderable.
+            if not paper.scanned_image_url:
+                raise ValueError(
+                    "Missing scanned_image_url - source document was not stored."
+                )
             page_bytes = _run_async(storage_service.get_object(paper.scanned_image_url))
             ocr = _transcribe(page_bytes)
             result = evaluate_answer(
@@ -121,6 +130,8 @@ def process_paper_task(self, paper_id: str) -> dict[str, str]:
             paper.evaluated_at = datetime.now(timezone.utc)
         except Exception as exc:  # noqa: BLE001
             logger.exception("Paper %s evaluation failed.", paper_id)
+            # Preserve scanned_image_url on failure: the viewer still needs the
+            # original document path even when OCR/evaluation did not succeed.
             paper.status = PaperStatus.failed
             paper.diagnostic_logs = {"error": str(exc)[:500]}
             if paper.batch_id:

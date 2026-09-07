@@ -12,6 +12,9 @@ class QueuedPaperRef(BaseModel):
 
     id: UUID
     student_id: str
+    # Web-accessible source document (relative /static/... or absolute OSS URL),
+    # persisted at ingestion BEFORE OCR so the viewer can render it immediately.
+    scanned_image_url: str | None = None
 
 
 class BatchUploadResponse(BaseModel):
@@ -79,6 +82,9 @@ class QueuePaper(BaseModel):
     status: str
     score: float | None = None
     max_score: float = 10.0
+    # Web-accessible source document so the ingestion feed can link the original
+    # scan without an extra detail round-trip.
+    scanned_image_url: str | None = None
 
 
 class PaperQueueResponse(BaseModel):

@@ -95,9 +95,23 @@ async def ingest_batch(
             key = storage_service.build_key(
                 "papers", exam.exam_id, f"paper_{global_index:03d}.pdf"
             )
+            # Persist the page to object storage FIRST and capture its
+            # web-accessible URL (local fallback -> "/static/<key>"; OSS -> a
+            # public HTTP URL). It is written straight onto
+            # StudentPaper.scanned_image_url and committed BEFORE any OCR task is
+            # dispatched, so the original document is always renderable in the
+            # viewer even if OCR later fails or extracts no text.
             url = await storage_service.put_object(
                 key, page_bytes, "application/pdf"
             )
+            if not url:
+                # Safety net: never persist a paper without a resolvable source
+                # document -- a NULL scanned_image_url leaves the viewer nothing
+                # to display and breaks the "always populated" ingestion guarantee.
+                raise BatchIngestionError(
+                    f"Object storage returned no URL for paper {identifier}; "
+                    "cannot ingest a sheet without a source document."
+                )
             paper = StudentPaper(
                 exam_id=exam.exam_id,
                 batch_id=batch.batch_id,

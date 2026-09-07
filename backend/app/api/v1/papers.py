@@ -153,7 +153,11 @@ async def batch_upload(
         total_papers=batch.total_papers,
         status="processing",
         papers=[
-            QueuedPaperRef(id=p.paper_id, student_id=p.student_identifier)
+            QueuedPaperRef(
+                id=p.paper_id,
+                student_id=p.student_identifier,
+                scanned_image_url=p.scanned_image_url,
+            )
             for p in papers
         ],
     )
@@ -192,6 +196,7 @@ async def get_paper_queue(
                 status=_UI_STATUS.get(paper.status, "queued"),
                 score=paper.effective_score,
                 max_score=paper.max_score if paper.max_score is not None else 10.0,
+                scanned_image_url=paper.scanned_image_url,
             )
             for paper in papers
         ],
