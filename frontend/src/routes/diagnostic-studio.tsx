@@ -42,8 +42,18 @@ export const Route = createFileRoute("/diagnostic-studio")({
 });
 
 const LANGS: LanguageCode[] = ["en", "ur", "sd", "pa"];
-/** Fallback scanned-sheet source so the viewer never renders an empty state during demos. */
-const DEFAULT_SHEET_URL = "/static/sample_sheet.pdf";
+/** Backend origin: API_BASE_URL minus its `/api/v1` suffix. Relative `/static/…`
+ * scan paths resolve against this — never the Vercel frontend root (which 404s).
+ * Derived with `.replace` (not `new URL`) so a malformed base can't throw. */
+const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api\/v1\/?$/, "");
+/** Reliable public demo PDF used when the backend origin can't be resolved. */
+const PUBLIC_FALLBACK_PDF =
+  "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+/** Default scanned-sheet source: the backend's static sample, or the public demo
+ * PDF when the origin is empty — so the viewer never 404s or shows empty state. */
+const DEFAULT_SHEET_URL = BACKEND_ORIGIN
+  ? `${BACKEND_ORIGIN}/static/sample_sheet.pdf`
+  : PUBLIC_FALLBACK_PDF;
 
 function DiagnosticStudio() {
   const { exam_id, student_id } = Route.useSearch();
@@ -78,16 +88,20 @@ function DiagnosticStudio() {
   // Debug: surface the active paper so scan_url / scanned_image_url resolution is visible.
   console.log("Active Paper Data:", paper);
 
-  // Resolve the scanned-sheet source by priority, falling back to a static demo
-  // sheet so the viewer never renders an empty state during demos. A relative
-  // backend path (/static/…, /uploads/…) is resolved against the API origin so
-  // the absolute-URL guard accepts it and the <iframe> never embeds the app.
-  const rawPaperUrl =
-    paper?.file_url || paper?.scan_url || paper?.pdf_url || DEFAULT_SHEET_URL;
-  const resolvedPaperUrl = rawPaperUrl.startsWith("/")
-    ? `${new URL(API_BASE_URL).origin}${rawPaperUrl}`
-    : rawPaperUrl;
-  const paperUrl = /^(https?:|blob:)/i.test(resolvedPaperUrl) ? resolvedPaperUrl : "";
+  // Resolve the scanned-sheet source by priority. Absolute http/blob URLs pass
+  // through; relative /static/… or /uploads/… paths resolve against the backend
+  // origin (never the frontend root, which 404s). If nothing resolves to an
+  // absolute URL, fall back to DEFAULT_SHEET_URL (backend static sample, or the
+  // public demo PDF when the origin is empty) so the viewer never 404s or blanks.
+  const rawPaperUrl = paper?.file_url || paper?.scan_url || paper?.pdf_url || "";
+  const resolvedPaperUrl = /^(https?:|blob:)/i.test(rawPaperUrl)
+    ? rawPaperUrl
+    : rawPaperUrl.startsWith("/")
+      ? `${BACKEND_ORIGIN}${rawPaperUrl}`
+      : "";
+  const paperUrl = /^(https?:|blob:)/i.test(resolvedPaperUrl)
+    ? resolvedPaperUrl
+    : DEFAULT_SHEET_URL;
   const hasPreview = paperUrl.length > 0;
   const paperIsImage = /\.(jpe?g|png)(\?|#|$)/i.test(paperUrl);
 
