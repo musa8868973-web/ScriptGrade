@@ -46,14 +46,12 @@ const LANGS: LanguageCode[] = ["en", "ur", "sd", "pa"];
  * scan paths resolve against this — never the Vercel frontend root (which 404s).
  * Derived with `.replace` (not `new URL`) so a malformed base can't throw. */
 const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api\/v1\/?$/, "");
-/** Reliable public demo PDF used when the backend origin can't be resolved. */
-const PUBLIC_FALLBACK_PDF =
-  "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
-/** Default scanned-sheet source: the backend's static sample, or the public demo
- * PDF when the origin is empty — so the viewer never 404s or shows empty state. */
-const DEFAULT_SHEET_URL = BACKEND_ORIGIN
-  ? `${BACKEND_ORIGIN}/static/sample_sheet.pdf`
-  : PUBLIC_FALLBACK_PDF;
+/** True only when BACKEND_ORIGIN is a non-empty absolute http(s) URL, so a
+ * relative scan path is prefixed with it only when it can actually resolve. */
+const HAS_BACKEND_ORIGIN = /^https?:\/\//i.test(BACKEND_ORIGIN);
+/** Guaranteed-working external demo PDF, used whenever the paper has no usable
+ * URL or the backend origin is empty/invalid — so the viewer can never 404. */
+const PUBLIC_FALLBACK_PDF = "https://pdfobject.com/pdf/sample.pdf";
 
 function DiagnosticStudio() {
   const { exam_id, student_id } = Route.useSearch();
@@ -88,20 +86,18 @@ function DiagnosticStudio() {
   // Debug: surface the active paper so scan_url / scanned_image_url resolution is visible.
   console.log("Active Paper Data:", paper);
 
-  // Resolve the scanned-sheet source by priority. Absolute http/blob URLs pass
-  // through; relative /static/… or /uploads/… paths resolve against the backend
-  // origin (never the frontend root, which 404s). If nothing resolves to an
-  // absolute URL, fall back to DEFAULT_SHEET_URL (backend static sample, or the
-  // public demo PDF when the origin is empty) so the viewer never 404s or blanks.
+  // Resolve the scanned-sheet source per priority. An absolute http(s) URL is
+  // used as-is; a relative path (/static/…, /uploads/…) is prefixed with the
+  // backend origin only when that origin is a valid absolute http(s) URL. In
+  // every other case — no paper URL, or an empty/invalid backend origin (e.g.
+  // missing env vars) — use PUBLIC_FALLBACK_PDF, so the <iframe> src is always
+  // a guaranteed-valid absolute URL and a 404 is impossible.
   const rawPaperUrl = paper?.file_url || paper?.scan_url || paper?.pdf_url || "";
-  const resolvedPaperUrl = /^(https?:|blob:)/i.test(rawPaperUrl)
+  const paperUrl = /^https?:\/\//i.test(rawPaperUrl)
     ? rawPaperUrl
-    : rawPaperUrl.startsWith("/")
+    : rawPaperUrl.startsWith("/") && HAS_BACKEND_ORIGIN
       ? `${BACKEND_ORIGIN}${rawPaperUrl}`
-      : "";
-  const paperUrl = /^(https?:|blob:)/i.test(resolvedPaperUrl)
-    ? resolvedPaperUrl
-    : DEFAULT_SHEET_URL;
+      : PUBLIC_FALLBACK_PDF;
   const hasPreview = paperUrl.length > 0;
   const paperIsImage = /\.(jpe?g|png)(\?|#|$)/i.test(paperUrl);
 
