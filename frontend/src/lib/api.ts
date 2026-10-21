@@ -147,7 +147,7 @@ export interface BackendBatchUploadResponse {
   total_papers: number;
   status: string;
   /** Auto-assigned papers (id + STU-2026-NNN) for immediate name mapping. */
-  papers: { id: string; student_id: string }[];
+  papers: { id: string; student_id: string; scanned_image_url?: string | null }[];
 }
 
 interface BackendOverrideResponse {

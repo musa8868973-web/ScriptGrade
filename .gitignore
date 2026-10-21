@@ -5,3 +5,6 @@ frontend/android/.gradle/
 
 # Stray toolchain install log (local build artifact)
 .localstack_install.log
+
+# Local object-storage fallback
+storage/

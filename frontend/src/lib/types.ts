@@ -91,6 +91,10 @@ export interface QueuePaper {
   status: PaperStatus;
   score: number | null;
   max_score: number;
+  /** Web-accessible source document URL (relative /static/... or absolute OSS URL).
+   *  Served by GET /papers/queue so the ingestion viewer can display the sheet
+   *  without an extra detail round-trip (backend QueuePaper schema §5.3). */
+  scanned_image_url?: string | null;
 }
 
 export interface PaperQueueResponse {

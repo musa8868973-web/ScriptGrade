@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/layout/AppShell";
 import { PaperStatusBadge } from "@/components/badges";
 import { DEBUGGERS } from "@/components/debuggers/DebuggerPanel";
+import { SheetViewer } from "@/components/SheetViewer";
 import {
   useBatchUpload,
   useOverride,
@@ -27,6 +28,7 @@ import {
   usePaperQueue,
   useSetStudentName,
 } from "@/lib/queries";
+import { useGradeStore } from "@/stores/grade";
 import { DEMO_EXAM_ID } from "@/lib/demo-data";
 import { API_BASE_URL } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -36,6 +38,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { TERMINAL_QUEUE_STATES, type PaperDetail, type PaperStatus } from "@/lib/types";
 
 const MAX_BATCH_BYTES = 200 * 1024 * 1024;
+
+/** Backend origin for resolving relative /static/... scan paths. */
+const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api\/v1\/?$/, "");
+const HAS_BACKEND_ORIGIN = /^https?:\/\//i.test(BACKEND_ORIGIN);
 
 /** Client-side batch item lifecycle mirrors PRD §1.3 paper states */
 type BatchItem = {
@@ -186,6 +192,7 @@ function StudentNameField({
 function IngestionPage() {
   const { exam_id } = Route.useSearch();
   const navigate = useNavigate();
+  const studentPaperBlobUrl = useGradeStore((s) => s.studentPaperBlobUrl);
   const [items, setItems] = useState<BatchItem[]>([]);
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -214,7 +221,22 @@ function IngestionPage() {
   useEffect(() => {
     const created = upload.data?.papers;
     if (created?.length) {
-      setQuickStudent(created[0]!.student_id);
+      const newlyCreated = created[0]!;
+      setQuickStudent(newlyCreated.student_id);
+
+      const rawUrl = newlyCreated.scanned_image_url || "";
+      const resolvedUrl = /^https?:\/\//i.test(rawUrl)
+        ? rawUrl
+        : rawUrl.startsWith("/") && HAS_BACKEND_ORIGIN
+          ? `${BACKEND_ORIGIN}${rawUrl}`
+          : rawUrl;
+
+      useGradeStore.getState().setStudentPaper({
+        studentId: newlyCreated.student_id,
+        url: resolvedUrl,
+        file: items[0]?.file ?? null,
+      });
+
       if (mode === "single") setItems([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -257,6 +279,9 @@ function IngestionPage() {
       return;
     }
     setItems(next);
+    if (mapped[0]?.file) {
+      useGradeStore.getState().setStudentPaper({ file: mapped[0].file });
+    }
   };
 
   const patch = (id: string, data: Partial<BatchItem>) =>
@@ -285,12 +310,45 @@ function IngestionPage() {
     upload.mutate(items.map((i) => i.file));
   };
 
-  const openStudio = (studentId: string) =>
-    navigate({ to: "/diagnostic-studio", search: { exam_id, student_id: studentId } });
+  const openStudio = (studentId: string) => {
+    const paperRow = papers.find((p) => p.student_id === studentId);
+    const targetRaw = (studentId === quickStudent ? rawSheetUrl : null) || paperRow?.scanned_image_url || "";
+    const resolvedUrl = /^https?:\/\//i.test(targetRaw)
+      ? targetRaw
+      : targetRaw.startsWith("/") && HAS_BACKEND_ORIGIN
+        ? `${BACKEND_ORIGIN}${targetRaw}`
+        : targetRaw || undefined;
+
+    useGradeStore.getState().setActiveStudent(studentId);
+    if (resolvedUrl) {
+      useGradeStore.getState().setStudentPaper({ studentId, url: resolvedUrl });
+    }
+
+    navigate({
+      to: "/diagnostic-studio",
+      search: {
+        exam_id,
+        student_id: studentId,
+        ...(resolvedUrl ? { sheet_url: resolvedUrl } : {}),
+      },
+    });
+  };
 
   const signals = detail.data ? quickSignals(detail.data) : null;
   const selectedName = papers.find((p) => p.student_id === quickStudent)?.student_name ?? null;
   const maxScore = detail.data?.max_score || 10;
+
+  // Resolve the selected paper's scanned URL into a guaranteed-absolute URL for
+  // SheetViewer (identical resolution logic as diagnostic-studio.tsx).
+  const rawSheetUrl =
+    detail.data?.scanned_image_url ||
+    papers.find((p) => p.student_id === quickStudent)?.scanned_image_url ||
+    "";
+  const sheetUrl = /^https?:\/\//i.test(rawSheetUrl)
+    ? rawSheetUrl
+    : rawSheetUrl.startsWith("/") && HAS_BACKEND_ORIGIN
+      ? `${BACKEND_ORIGIN}${rawSheetUrl}`
+      : null;
 
   return (
     <AppShell
@@ -298,7 +356,36 @@ function IngestionPage() {
       title="Answer Sheet Ingestion"
       actions={
         <button
-          onClick={() => navigate({ to: "/diagnostic-studio", search: { exam_id } })}
+          onClick={() => {
+            const targetId = quickStudent ?? upload.data?.papers?.[0]?.student_id ?? papers[0]?.student_id;
+            const paperRow = papers.find((p) => p.student_id === targetId);
+            const targetRaw =
+              (targetId === quickStudent ? rawSheetUrl : null) ||
+              paperRow?.scanned_image_url ||
+              upload.data?.papers?.[0]?.scanned_image_url ||
+              "";
+            const resolvedUrl = /^https?:\/\//i.test(targetRaw)
+              ? targetRaw
+              : targetRaw.startsWith("/") && HAS_BACKEND_ORIGIN
+                ? `${BACKEND_ORIGIN}${targetRaw}`
+                : targetRaw || undefined;
+
+            if (targetId) {
+              useGradeStore.getState().setActiveStudent(targetId);
+              if (resolvedUrl) {
+                useGradeStore.getState().setStudentPaper({ studentId: targetId, url: resolvedUrl });
+              }
+            }
+
+            navigate({
+              to: "/diagnostic-studio",
+              search: {
+                exam_id,
+                ...(targetId ? { student_id: targetId } : {}),
+                ...(resolvedUrl ? { sheet_url: resolvedUrl } : {}),
+              },
+            });
+          }}
           className="magnetic inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
         >
           Open Diagnostic Studio <ArrowRight size={15} />
@@ -509,29 +596,41 @@ function IngestionPage() {
                 </p>
               ) : (
                 signals && (
-                  <div className="grid gap-x-8 gap-y-1.5 sm:grid-cols-2">
-                    {DEBUGGERS.map(({ n, roman, key, label }) => {
-                      const sig = signals[key];
-                      const ok = sig?.ok ?? true;
-                      return (
-                        <div key={n} className="flex items-center gap-2 py-1 text-sm">
-                          {ok ? (
-                            <CheckCircle2 size={14} className="shrink-0 text-pass" />
-                          ) : (
-                            <AlertTriangle size={14} className="shrink-0 text-alert" />
-                          )}
-                          <span className="mono-token w-8 shrink-0 text-[0.625rem] text-muted-foreground">
-                            {roman}
-                          </span>
-                          <span className="w-24 shrink-0 font-medium">{label}</span>
-                          <span
-                            className={cn("ml-auto text-right", ok ? "text-pass" : "text-alert")}
-                          >
-                            {sig?.text}
-                          </span>
-                        </div>
-                      );
-                    })}
+                  <div className="space-y-5">
+                    {/* ── Sheet preview (lazy-loaded, intersection-observer) ── */}
+                    <SheetViewer
+                      url={sheetUrl}
+                      blobUrl={studentPaperBlobUrl}
+                      file={items[0]?.file}
+                      studentId={quickStudent ?? undefined}
+                      height={480}
+                    />
+
+                    {/* ── 8-debugger signal grid ─────────────────────────── */}
+                    <div className="grid gap-x-8 gap-y-1.5 sm:grid-cols-2">
+                      {DEBUGGERS.map(({ n, roman, key, label }) => {
+                        const sig = signals[key];
+                        const ok = sig?.ok ?? true;
+                        return (
+                          <div key={n} className="flex items-center gap-2 py-1 text-sm">
+                            {ok ? (
+                              <CheckCircle2 size={14} className="shrink-0 text-pass" />
+                            ) : (
+                              <AlertTriangle size={14} className="shrink-0 text-alert" />
+                            )}
+                            <span className="mono-token w-8 shrink-0 text-[0.625rem] text-muted-foreground">
+                              {roman}
+                            </span>
+                            <span className="w-24 shrink-0 font-medium">{label}</span>
+                            <span
+                              className={cn("ml-auto text-right", ok ? "text-pass" : "text-alert")}
+                            >
+                              {sig?.text}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )
               )}

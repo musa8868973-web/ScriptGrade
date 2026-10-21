@@ -1,22 +1,31 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Image as ImageIcon, Loader2, Save, ScanEye, ScanText } from "lucide-react";
+import { Loader2, Save, ScanEye, ScanText } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { LanguageBadge, PaperStatusBadge, SourceBadge } from "@/components/badges";
 import { DEBUGGERS, DebuggerTabContent, toneClasses } from "@/components/debuggers/DebuggerPanel";
+import { SheetViewer } from "@/components/SheetViewer";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { usePaper, usePaperQueue, useOverride } from "@/lib/queries";
+import { useGradeStore } from "@/stores/grade";
 import { API_BASE_URL } from "@/lib/api";
 import { DEMO_EXAM_ID } from "@/lib/demo-data";
 import { LANGUAGE_LABELS, RTL_LANGUAGES, type LanguageCode } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/diagnostic-studio")({
-  validateSearch: (search: Record<string, unknown>): { exam_id: string; student_id?: string } => ({
+  validateSearch: (search: Record<string, unknown>): {
+    exam_id: string;
+    student_id?: string;
+    sheet_url?: string;
+  } => ({
     exam_id: typeof search["exam_id"] === "string" ? (search["exam_id"] as string) : DEMO_EXAM_ID,
     ...(typeof search["student_id"] === "string"
       ? { student_id: search["student_id"] as string }
+      : {}),
+    ...(typeof search["sheet_url"] === "string"
+      ? { sheet_url: search["sheet_url"] as string }
       : {}),
   }),
   head: () => ({
@@ -48,12 +57,16 @@ const BACKEND_ORIGIN = API_BASE_URL.replace(/\/api\/v1\/?$/, "");
 /** True only when BACKEND_ORIGIN is a non-empty absolute http(s) URL, so a
  * relative scan path is prefixed with it only when it can actually resolve. */
 const HAS_BACKEND_ORIGIN = /^https?:\/\//i.test(BACKEND_ORIGIN);
-/** Guaranteed-working external demo PDF, used whenever the paper has no usable
- * URL or the backend origin is empty/invalid — so the viewer can never 404. */
-const PUBLIC_FALLBACK_PDF = "https://pdfobject.com/pdf/sample.pdf";
+/** Guaranteed-working local demo PDF, used ONLY whenever the paper has no usable
+ * URL anywhere or is fundamentally missing. */
+const PUBLIC_FALLBACK_PDF = "/sample.pdf";
 
 function DiagnosticStudio() {
-  const { exam_id, student_id } = Route.useSearch();
+  const { exam_id, student_id, sheet_url } = Route.useSearch();
+  const storeStudentPaperUrl = useGradeStore((s) => s.studentPaperUrl);
+  const storeStudentPaperBlob = useGradeStore((s) => s.studentPaperBlobUrl);
+  const storeStudentPaperFile = useGradeStore((s) => s.studentPaperFile);
+
   const { data: queue } = usePaperQueue(exam_id);
   const papers = useMemo(() => queue?.papers ?? [], [queue]);
 
@@ -85,20 +98,34 @@ function DiagnosticStudio() {
   // Debug: surface the active paper so scan_url / scanned_image_url resolution is visible.
   console.log("Active Paper Data:", paper);
 
-  // Resolve the scanned-sheet source per priority. An absolute http(s) URL is
-  // used as-is; a relative path (/static/…, /uploads/…) is prefixed with the
-  // backend origin only when that origin is a valid absolute http(s) URL. In
-  // every other case — no paper URL, or an empty/invalid backend origin (e.g.
-  // missing env vars) — use PUBLIC_FALLBACK_PDF, so the <iframe> src is always
-  // a guaranteed-valid absolute URL and a 404 is impossible.
-  // Priority: raw backend scanned_image_url, then canonical scan_url, then file_url, then pdf_url.
-  const rawPaperUrl =
+  // Dynamic candidate resolution:
+  // If active student matches the searched/ingested student, prioritize the dynamically passed sheet reference.
+  const isMatchingActive = !active || active === student_id;
+  const dynamicCandidate = isMatchingActive
+    ? sheet_url || storeStudentPaperBlob || storeStudentPaperUrl || ""
+    : "";
+
+  const backendPaperUrl =
     paper?.scanned_image_url || paper?.scan_url || paper?.file_url || paper?.pdf_url || "";
-  const paperUrl = /^https?:\/\//i.test(rawPaperUrl)
+  const queuePaperUrl = papers.find((p) => p.student_id === active)?.scanned_image_url || "";
+
+  // Prioritize: dynamic sheet passed from Ingestion > paper's scanned URL from API > queue scanned URL > store fallback
+  const rawPaperUrl =
+    dynamicCandidate ||
+    backendPaperUrl ||
+    queuePaperUrl ||
+    storeStudentPaperBlob ||
+    storeStudentPaperUrl ||
+    "";
+
+  const paperUrl = rawPaperUrl.startsWith("blob:") || /^https?:\/\//i.test(rawPaperUrl)
     ? rawPaperUrl
     : rawPaperUrl.startsWith("/") && HAS_BACKEND_ORIGIN
       ? `${BACKEND_ORIGIN}${rawPaperUrl}`
-      : PUBLIC_FALLBACK_PDF;
+      : rawPaperUrl
+        ? rawPaperUrl
+        : PUBLIC_FALLBACK_PDF;
+
   const hasPreview = paperUrl.length > 0;
   const paperIsImage = /\.(jpe?g|png)(\?|#|$)/i.test(paperUrl);
 
@@ -164,32 +191,22 @@ function DiagnosticStudio() {
 
               <div>
                 <div className="section-title text-[0.6875rem] font-semibold tracking-wide uppercase">
-                  <ImageIcon size={12} /> Scanned Sheet
+                  Scanned Sheet
                   <span className="mono-token ml-auto text-[0.6875rem] normal-case">
                     OCR confidence {paper.ocr_confidence.toFixed(1)}%
                   </span>
                 </div>
-                {!hasPreview ? (
-                  <p className="mt-3 rounded-lg border border-border bg-card px-4 py-10 text-center text-xs text-muted-foreground">
-                    No document preview available for this scan.
-                  </p>
-                ) : paperIsImage ? (
-                  <div className="mt-3 overflow-y-auto rounded-lg border border-slate-200">
-                    <img
-                      src={paperUrl}
-                      alt={`Scanned answer sheet for ${paper.student_id}`}
-                      className="w-full"
-                    />
-                  </div>
-                ) : (
-                  <div className="mt-3 h-[600px] w-full overflow-hidden rounded-lg border border-slate-200">
-                    <iframe
-                      src={`${paperUrl}#toolbar=0&navpanes=0`}
-                      className="block h-full w-full border-0"
-                      title="Answer Sheet Preview"
-                    />
-                  </div>
-                )}
+                {/* SheetViewer: intersection-observer lazy-load, toolbar, zoom.
+                    Pass the resolved absolute URL directly — SheetViewer renders
+                    a NoPreview placeholder when url is null/relative. */}
+                <SheetViewer
+                  url={hasPreview ? paperUrl : null}
+                  blobUrl={isMatchingActive ? storeStudentPaperBlob : undefined}
+                  file={isMatchingActive ? storeStudentPaperFile : undefined}
+                  studentId={paper.student_id}
+                  height={620}
+                  className="mt-3"
+                />
               </div>
 
               <div>

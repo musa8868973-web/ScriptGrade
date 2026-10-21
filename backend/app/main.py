@@ -21,10 +21,16 @@ from app.database import engine, init_models
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    """Application lifecycle: ensure relational schema exists on startup."""
+    """Application lifecycle: ensure relational schema and demo data exist on startup."""
     await init_models()
+    try:
+        from seed import seed
+        await seed()
+    except Exception as exc:
+        pass
     yield
     await engine.dispose()
+
 
 
 app = FastAPI(
@@ -56,6 +62,23 @@ app.add_middleware(
 
 app.include_router(api_router, prefix=settings.api_v1_prefix)
 
+class EmbeddableStaticFiles(StaticFiles):
+    """Static file handler ensuring files are embeddable in iframes across origins."""
+
+    async def get_response(self, path: str, scope):
+        response = await super().get_response(path, scope)
+        response.headers["Content-Disposition"] = "inline"
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
+        # Explicitly remove X-Frame-Options so Chrome does not block iframe/embed rendering
+        if "x-frame-options" in response.headers:
+            del response.headers["x-frame-options"]
+        response.headers["Content-Security-Policy"] = "frame-ancestors *"
+        return response
+
+
 # Serve locally-stored scans when OSS is not configured: the ingestion
 # fallback persists files under LOCAL_STORAGE_DIR and stores the web-relative
 # "/static/<key>" path in StudentPaper.scanned_image_url, which the frontend
@@ -63,7 +86,7 @@ app.include_router(api_router, prefix=settings.api_v1_prefix)
 # at a mounted volume so uploads survive redeploys.
 _local_storage = Path(settings.local_storage_dir).resolve()
 _local_storage.mkdir(parents=True, exist_ok=True)
-app.mount("/static", StaticFiles(directory=str(_local_storage)), name="static")
+app.mount("/static", EmbeddableStaticFiles(directory=str(_local_storage)), name="static")
 
 
 @app.get("/health", tags=["infra"])

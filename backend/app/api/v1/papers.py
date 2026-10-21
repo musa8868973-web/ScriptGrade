@@ -2,6 +2,7 @@
 
 from uuid import UUID
 
+import logging
 from fastapi import (
     APIRouter,
     Depends,
@@ -11,6 +12,8 @@ from fastapi import (
     UploadFile,
     status,
 )
+logger = logging.getLogger(__name__)
+
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -123,29 +126,47 @@ async def batch_upload(
         ) from None
 
     exam = await get_owned_exam(db, exam_uuid, current_user)
-
     uploads: list[UploadFile] = [f for f in (batch_pdf_file, *files) if f is not None]
+    upload_names = [f.filename for f in uploads]
+    logger.info(
+        "Batch upload received for exam %s by user %s (%d file(s): %s)",
+        exam_uuid,
+        current_user.user_id,
+        len(uploads),
+        upload_names,
+    )
+
     if not uploads:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Provide scanner PDFs via 'batch_pdf_file' or 'files'",
+            detail="Provide scanner PDFs or images via 'batch_pdf_file' or 'files'",
         )
 
     try:
         batch, papers = await ingest_batch(db, exam, current_user, uploads)
     except BatchIngestionError as exc:
+        logger.warning("Batch ingestion rejected: %s", exc)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Unexpected error during batch ingestion: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Batch ingestion processing failed: {exc}",
+        ) from exc
 
     # Commit before dispatch so Celery workers can see the queued rows.
     await db.commit()
+    logger.info("Batch %s committed with %d paper(s). Dispatching evaluation pipeline.", batch.batch_id, len(papers))
 
     paper_ids = [p.paper_id for p in papers]
     try:
         dispatch_evaluation(paper_ids)
-    except Exception as exc:  # noqa: BLE001 — broker outage is a 503
+        logger.info("Evaluation pipeline dispatched successfully for %d paper(s).", len(paper_ids))
+    except Exception as exc:
+        logger.exception("Failed during evaluation dispatch: %s", exc)
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Task queue unavailable; batch stored but not dispatched",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Evaluation pipeline failed to dispatch: {exc}",
         ) from exc
 
     return BatchUploadResponse(
