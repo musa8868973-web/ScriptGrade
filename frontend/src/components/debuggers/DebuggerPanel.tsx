@@ -3,6 +3,7 @@ import {
   ArrowRight,
   CheckCircle2,
   Eye,
+  Lock,
   Ruler,
   ScanText,
   SpellCheck2,
@@ -12,6 +13,44 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PaperDetail } from "@/lib/types";
+
+/** Debugger tab numbers that are fully active in the current hackathon demo build.
+ *  IV (4), V (5), VI (6), VII (7) are Phase 2 and show a locked placeholder. */
+const ACTIVE_DEBUGGERS = new Set([1, 2, 3, 8]);
+
+/** Placeholder rendered instead of live content for Phase 2 (skipped) debuggers. */
+function Phase2Placeholder({ label }: { label: string }) {
+  return (
+    <div className="relative overflow-hidden rounded-lg border border-dashed border-border/60 bg-muted/20 px-4 py-5">
+      {/* Subtle diagonal watermark */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04]"
+      >
+        <span className="rotate-[-30deg] text-[5rem] font-black uppercase tracking-widest text-foreground">
+          Phase 2
+        </span>
+      </div>
+
+      <div className="flex items-center gap-3 opacity-60">
+        <Lock size={15} className="shrink-0 text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">{label}</span> analysis is coming in Phase 2.
+        </p>
+      </div>
+
+      <div className="mt-3 flex items-center gap-2">
+        <span className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary/60 px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-muted-foreground">
+          <Lock size={9} />
+          Phase 2
+        </span>
+        <span className="text-[0.7rem] text-muted-foreground/70">
+          Not scored · No impact on final grade
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export const DEBUGGERS = [
   { n: 1, roman: "I", key: "garbage", label: "Garbage Text", tone: "alert", Icon: Trash2 },
@@ -92,6 +131,12 @@ function DataTable({ head, rows }: { head: string[]; rows: React.ReactNode[][] }
 
 export function DebuggerTabContent({ tab, paper }: { tab: number; paper: PaperDetail }) {
   const d = paper.debuggers;
+
+  // Phase 2 gate — skipped debuggers show a locked placeholder, never touching mocked fields.
+  if (!ACTIVE_DEBUGGERS.has(tab)) {
+    const label = DEBUGGERS.find((dg) => dg.n === tab)?.label ?? `Debugger ${tab}`;
+    return <Phase2Placeholder label={label} />;
+  }
 
   if (tab === 1) {
     const g = d.garbage;

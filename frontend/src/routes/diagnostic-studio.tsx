@@ -251,15 +251,21 @@ function DiagnosticStudio() {
                 <ul className="divide-y divide-border">
                   {DEBUGGERS.map(({ n, roman, label, tone, Icon }) => {
                     const t = toneClasses[tone];
+                    const isPhase2 = ![1, 2, 3, 8].includes(n);
                     return (
-                      <li key={n} className="py-5">
+                      <li key={n} className={cn("py-5", isPhase2 && "opacity-50")}>
                         <div className="flex items-center gap-2.5">
-                          <span className={cn("size-1.5 shrink-0 rounded-full", t.dot)} />
+                          <span className={cn("size-1.5 shrink-0 rounded-full", isPhase2 ? "bg-muted-foreground/40" : t.dot)} />
                           <span className="mono-token text-[0.625rem] text-muted-foreground">
                             {roman}
                           </span>
-                          <Icon size={13} className="text-muted-foreground" />
-                          <h3 className="text-sm font-medium">{label}</h3>
+                          <Icon size={13} className={isPhase2 ? "text-muted-foreground/50" : "text-muted-foreground"} />
+                          <h3 className={cn("text-sm font-medium", isPhase2 && "text-muted-foreground")}>{label}</h3>
+                          {isPhase2 && (
+                            <span className="ml-auto inline-flex items-center gap-1 rounded-full border border-border/60 bg-secondary/40 px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wide text-muted-foreground/70">
+                              Coming Soon
+                            </span>
+                          )}
                         </div>
                         <div className="mt-3 pl-6">
                           <DebuggerTabContent tab={n} paper={paper} />

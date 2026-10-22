@@ -4,14 +4,17 @@ Pure-Python implementation of the ScriptGrade grading brain used by the
 Celery workers. It consumes an OCR transcript plus the exam rubric and
 produces the exact diagnostic JSON contract documented in the PRD:
 
-    I   — Garbage text & hallucination detection
-    II  — Negation & reversal modifiers
-    III — Synonym & semantic matching
-    IV  — Fuzzy spelling auto-correction (Levenshtein >= 85%)
-    V   — Sequence / procedural DAG verification
-    VI  — Diagram & visual inspection passthrough (Qwen-VL)
-    VII — Anti-fluff information density scoring
-    VIII— Itemized weighted rubric aggregation
+    I   — Garbage text & hallucination detection          [ACTIVE]
+    II  — Negation & reversal modifiers                   [ACTIVE]
+    III — Synonym & semantic matching                     [ACTIVE]
+    IV  — Fuzzy spelling auto-correction (Levenshtein)    [Phase 2 — skipped]
+    V   — Sequence / procedural DAG verification          [Phase 2 — skipped]
+    VI  — Diagram & visual inspection passthrough (Qwen-VL)[Phase 2 — skipped]
+    VII — Anti-fluff information density scoring          [Phase 2 — skipped]
+    VIII— Itemized weighted rubric aggregation            [ACTIVE — final score]
+
+Hackathon Demo Mode: only I, II, III, VIII execute. IV–VII return a
+structured mock/skipped payload so the frontend never crashes on missing keys.
 """
 
 import re
@@ -255,29 +258,14 @@ def evaluate_answer(
             }
         )
 
-    # Debugger V — sequence / procedural DAG verification.
-    detected_order = sorted(order_positions, key=lambda k: order_positions[k])
-    expected_index = {keyword: idx for idx, keyword in enumerate(expected_order)}
-    transitions_valid = all(
-        expected_index[detected_order[i]] <= expected_index[detected_order[i + 1]]
-        for i in range(len(detected_order) - 1)
-    )
-    if toggles.strict_order and not transitions_valid and len(detected_order) > 1:
-        # Enforce DAG: strip awards from concepts appearing out of order.
-        longest_valid_prefix: list[str] = []
-        highest = -1
-        for keyword in detected_order:
-            if expected_index[keyword] >= highest:
-                longest_valid_prefix.append(keyword)
-                highest = expected_index[keyword]
-        stripped = set(detected_order) - set(longest_valid_prefix)
-        for item in breakdown:
-            if item["concept"] in stripped and item["awarded"] > 0:
-                total_awarded -= item["awarded"]
-                item["awarded"] = 0.0
-                item["match_type"] = "none"
+    # ── Debugger V — SKIPPED (Phase 2) ───────────────────────────────────────
+    # Sequence / procedural DAG verification is deferred to Phase 2.
+    # A stable mock is returned so the frontend never crashes on missing keys.
+    detected_order: list[str] = []
+    transitions_valid = True
+    # (No DAG enforcement — total_awarded is NOT modified)
 
-    # Debugger I — garbage text / filler detection (sentence relevance).
+    # ── Debugger I — Garbage text / filler detection (ACTIVE) ────────────────
     sentences = [s for s in _SENTENCE_SPLIT_RE.split(transcript.strip()) if s.strip()]
     concept_vocab: set[str] = set()
     for concept in concepts:
@@ -293,22 +281,23 @@ def evaluate_answer(
     garbage_score = round(irrelevant / len(sentences), 2) if sentences else 1.0
     garbage_flagged = garbage_score >= _GARBAGE_SENTENCE_FLOOR
 
-    # Debugger VII — anti-fluff density ratio (PRD Algorithm I).
-    keyword_hits = sum(1 for t in tokens if t in concept_vocab)
-    density_ratio = round(keyword_hits / word_count * 100, 1) if word_count else 0.0
-    density_flagged = bool(toggles.density_scoring and density_ratio < _DENSITY_THRESHOLD)
+    # ── Debugger VII — SKIPPED (Phase 2) ─────────────────────────────────────
+    # Anti-fluff density scoring is deferred to Phase 2.
+    keyword_hits = 0
+    density_ratio = 0.0
+    density_flagged = False
 
-    # Debugger VI — visual evidence passthrough from Qwen-VL.
+    # ── Debugger VI — SKIPPED (Phase 2) ──────────────────────────────────────
+    # Visual / diagram inspection (Qwen-VL) is deferred to Phase 2.
     visual_info = visual or VisualEvidence()
-    diagram_verified = visual_info.diagram_present and bool(visual_info.elements)
+    diagram_verified = False
 
-    # Debugger VIII — weighted aggregation capped at max marks (Algorithm II).
+    # ── Debugger VIII — Weighted aggregation (ACTIVE — final score) ───────────
     total_score = round(min(total_awarded, max_possible), 2)
 
     is_flagged = bool(
         garbage_flagged
         or negated_tokens
-        or density_flagged
         or (ocr_confidence is not None and ocr_confidence < 60.0)
     )
 
@@ -342,50 +331,54 @@ def evaluate_answer(
                 "similarity search."
             ),
         },
+        # ── Debuggers IV, V, VI, VII — Phase 2 (skipped) ──────────────────────
+        # These modules are deferred to Phase 2 of the evaluation engine.
+        # Mock payloads are returned so the frontend renders without crashing.
         "IV_spelling_correction": {
-            "spelling_autocorrected": bool(corrections),
-            "corrections": corrections,
-            "detail": (
-                f"{len(corrections)} token(s) auto-corrected above 85% Levenshtein "
-                "threshold. No score deduction applied."
-                if corrections
-                else "No misspelled rubric tokens detected."
-            ),
+            "status": "skipped",
+            "phase": "Phase 2",
+            "spelling_autocorrected": False,
+            "corrections": [],
+            "detail": "Fuzzy spelling auto-correction is coming in Phase 2.",
+            "corrections_applied": 0,
+            "threshold": 0.85,
         },
         "V_sequence_dag": {
-            "sequence_match": transitions_valid,
+            "status": "skipped",
+            "phase": "Phase 2",
+            "sequence_match": True,
             "expected_order": expected_order,
-            "detected_order": detected_order,
-            "dag_transitions_valid": transitions_valid,
-            "detail": (
-                f"{len(detected_order)} procedural concept transition(s) validated "
-                f"against reference DAG. Strict order toggle: "
-                f"{'ENABLED' if toggles.strict_order else 'DISABLED'}."
-            ),
+            "detected_order": [],
+            "dag_transitions_valid": True,
+            "detail": "Sequence / procedural DAG verification is coming in Phase 2.",
+            "correct_order": True,
+            "strict_order_enabled": toggles.strict_order,
+            "transitions_validated": 0,
+            "transitions_expected": len(expected_order),
+            "steps": [{"label": kw, "detected": False} for kw in expected_order],
         },
         "VI_diagram_visual": {
-            "diagram_verified": diagram_verified,
-            "visual_confidence": visual_info.confidence,
-            "detected_elements": visual_info.elements,
-            "detail": (
-                f"Qwen-VL Vision Inspector verified {len(visual_info.elements)} "
-                "diagram element(s) from scanned image region."
-                if diagram_verified
-                else "No diagram elements detected or visual inspection unavailable."
-            ),
+            "status": "skipped",
+            "phase": "Phase 2",
+            "diagram_verified": False,
+            "visual_confidence": 0.0,
+            "detected_elements": [],
+            "detail": "Visual / diagram inspection (Qwen-VL) is coming in Phase 2.",
+            "verified": False,
+            "confidence": 0.0,
+            "image_width": 0,
+            "image_height": 0,
         },
         "VII_density_scorer": {
-            "density_ratio": density_ratio,
-            "valid_keyword_hits": keyword_hits,
+            "status": "skipped",
+            "phase": "Phase 2",
+            "density_ratio": 0.0,
+            "valid_keyword_hits": 0,
             "total_word_count": word_count,
-            "flagged": density_flagged,
-            "detail": (
-                f"Information density ({density_ratio}%) above the "
-                f"{_DENSITY_THRESHOLD:.0f}% fluff threshold."
-                if not density_flagged
-                else f"Information density ({density_ratio}%) below the "
-                f"{_DENSITY_THRESHOLD:.0f}% fluff threshold — length-bias flag raised."
-            ),
+            "flagged": False,
+            "detail": "Anti-fluff density scoring is coming in Phase 2.",
+            "threshold": _DENSITY_THRESHOLD,
+            "raw_ratio": 0.0,
         },
         "VIII_rubric_aggregator": {
             "rubric_breakdown": breakdown,
