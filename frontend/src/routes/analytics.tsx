@@ -149,40 +149,63 @@ function AnalyticsPage() {
     >
       {isLoading && !summary ? (
         <div className="py-24 text-center text-sm text-muted-foreground">
-          Loading class analytics…
+          Loading subject analytics…
         </div>
       ) : (
         <>
-          <p className="mono-token -mt-2 text-[0.6875rem] text-muted-foreground">
-            {summary?.title ?? "Exam"} · single-subject session
-          </p>
+          {/* ── Subject Identity Banner ─────────────────────────────────────── */}
+          <div className="mt-2 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-secondary/30 px-5 py-4">
+            <div className="flex flex-col gap-0.5">
+              <p className="text-[0.6875rem] font-medium tracking-wide text-muted-foreground uppercase">
+                Subject
+              </p>
+              <p className="text-base font-semibold tracking-tight">
+                {summary?.title ?? "—"}
+              </p>
+            </div>
+            <div className="h-8 w-px bg-border" />
+            <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-muted-foreground">
+              <span>
+                <b className="text-foreground">{summary?.scored_papers ?? 0}</b> papers scored
+              </span>
+              <span>
+                Class avg{" "}
+                <b className="text-foreground">
+                  {(summary?.class_average ?? 0).toFixed(2)} / {maxScore}
+                </b>
+              </span>
+              <span>
+                <b className="text-foreground">{mastery.length}</b> rubric concepts tracked
+              </span>
+            </div>
+          </div>
 
-          {/* KPI strip */}
+          {/* ── KPI strip ─────────────────────────────────────────────────── */}
           <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {[
               {
                 label: "Papers scored",
                 value: `${summary?.scored_papers ?? 0}`,
-                sub: `of ${summary?.total_papers ?? 0}`,
+                sub: `of ${summary?.total_papers ?? 0} submitted`,
                 tone: "brand",
               },
               {
                 label: "Class average",
                 value: `${(summary?.class_average ?? 0).toFixed(2)}`,
-                sub: `out of ${maxScore}`,
+                sub: `out of ${maxScore} marks`,
                 tone: "pass",
               },
               {
-                label: "Questions tracked",
-                value: `${mastery.length}`,
-                sub: "rubric concepts",
+                label: "Avg mastery",
+                value: `${mastery.length ? Math.round(mastery.reduce((acc, c) => acc + c.mastery, 0) / mastery.length) : 0}%`,
+                sub: "across all rubric concepts",
                 tone: "vision",
               },
               {
-                label: "Debugger signals",
-                value: `${debuggers.filter((d) => d.count > 0).length}`,
-                sub: `of ${debuggers.length} engines`,
-                tone: "warn",
+                label: "Concepts at-risk",
+                value: `${mastery.filter((c) => c.mastery < 60).length}`,
+                sub: "below 60% class mastery",
+                tone: "alert",
               },
             ].map((k) => (
               <div
@@ -205,14 +228,110 @@ function AnalyticsPage() {
             ))}
           </div>
 
-          {/* (a) Concept mastery + grade distribution */}
+          {/* ── Subject-wise Performance Table ────────────────────────────── */}
+          <section className="mt-10">
+            <h2 className="section-title text-[0.9375rem] font-semibold tracking-tight">
+              Subject-wise Concept Performance
+            </h2>
+            <p className="mono-token mt-2 text-[0.625rem] text-muted-foreground">
+              Per-concept breakdown for{" "}
+              <span className="font-semibold text-foreground">{summary?.title ?? "this subject"}</span>{" "}
+              — class average vs. full marks and mastery rate
+            </p>
+            <div className="mt-4 overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-left text-xs">
+                <thead className="border-b border-border bg-secondary/40">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold tracking-wide text-muted-foreground uppercase">
+                      Concept / Question
+                    </th>
+                    <th className="px-4 py-3 font-semibold tracking-wide text-muted-foreground uppercase">
+                      Full Marks
+                    </th>
+                    <th className="px-4 py-3 font-semibold tracking-wide text-muted-foreground uppercase">
+                      Class Avg
+                    </th>
+                    <th className="px-4 py-3 font-semibold tracking-wide text-muted-foreground uppercase">
+                      Mastery %
+                    </th>
+                    <th className="px-4 py-3 font-semibold tracking-wide text-muted-foreground uppercase">
+                      Status
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {mastery.map((c) => {
+                    const atRisk = c.mastery < 60;
+                    const strong = c.mastery >= 85;
+                    return (
+                      <tr key={c.concept} className="transition-colors hover:bg-secondary/20">
+                        <td className="px-4 py-3 font-medium text-foreground">{c.concept}</td>
+                        <td className="mono-token px-4 py-3 text-muted-foreground">{c.max}</td>
+                        <td className="mono-token px-4 py-3">
+                          <span
+                            style={{
+                              color: atRisk ? TONE_FILL["alert"] : strong ? TONE_FILL["pass"] : TONE_FILL["warn"],
+                            }}
+                          >
+                            {c.avg.toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="h-1.5 w-20 overflow-hidden rounded-full bg-secondary">
+                              <div
+                                className="h-full rounded-full"
+                                style={{
+                                  width: `${c.mastery}%`,
+                                  background: atRisk
+                                    ? TONE_FILL["alert"]
+                                    : strong
+                                      ? TONE_FILL["pass"]
+                                      : TONE_FILL["warn"],
+                                }}
+                              />
+                            </div>
+                            <span
+                              className="mono-token font-semibold"
+                              style={{
+                                color: atRisk ? TONE_FILL["alert"] : strong ? TONE_FILL["pass"] : TONE_FILL["warn"],
+                              }}
+                            >
+                              {c.mastery}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className="inline-flex items-center rounded-full px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wide"
+                            style={{
+                              background: atRisk
+                                ? "color-mix(in srgb, var(--alert) 12%, transparent)"
+                                : strong
+                                  ? "color-mix(in srgb, var(--pass) 12%, transparent)"
+                                  : "color-mix(in srgb, var(--warn) 12%, transparent)",
+                              color: atRisk ? TONE_FILL["alert"] : strong ? TONE_FILL["pass"] : TONE_FILL["warn"],
+                            }}
+                          >
+                            {atRisk ? "At Risk" : strong ? "Strong" : "Moderate"}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* ── Charts row ────────────────────────────────────────────────── */}
           <div className="mt-10 grid gap-10 xl:grid-cols-2">
             <section>
               <h2 className="section-title text-[0.9375rem] font-semibold tracking-tight">
-                Concept Mastery per Question
+                Concept Mastery — {summary?.title ?? "Subject"}
               </h2>
               <p className="mono-token mt-3 text-[0.625rem] text-muted-foreground">
-                % of class awarded full marks for each rubric concept
+                % of class awarded full marks per rubric concept
               </p>
               <div className="mt-4 h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -230,8 +349,14 @@ function AnalyticsPage() {
                       dataKey="mastery"
                       name="Mastery %"
                       radius={[2, 2, 0, 0]}
-                      fill={TONE_FILL["vision"]!}
-                    />
+                    >
+                      {mastery.map((c) => (
+                        <Cell
+                          key={c.concept}
+                          fill={c.mastery < 60 ? TONE_FILL["alert"]! : c.mastery >= 85 ? TONE_FILL["pass"]! : TONE_FILL["warn"]!}
+                        />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -239,10 +364,10 @@ function AnalyticsPage() {
 
             <section>
               <h2 className="section-title text-[0.9375rem] font-semibold tracking-tight">
-                Class Average per Question
+                Class Average vs Full Marks — {summary?.title ?? "Subject"}
               </h2>
               <p className="mono-token mt-3 text-[0.625rem] text-muted-foreground">
-                mean marks earned vs full marks · out of {maxScore}
+                mean marks earned vs full marks per concept · out of {maxScore}
               </p>
               <div className="mt-4 h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -270,11 +395,11 @@ function AnalyticsPage() {
             </section>
           </div>
 
-          {/* Grade distribution + (b) debugger breakdown */}
+          {/* ── Grade distribution + Active Debugger Signals ────────────── */}
           <div className="mt-10 grid gap-10 xl:grid-cols-2">
             <section>
               <h2 className="section-title text-[0.9375rem] font-semibold tracking-tight">
-                Grade Distribution
+                Grade Distribution — {summary?.title ?? "Subject"}
               </h2>
               <p className="mono-token mt-3 text-[0.625rem] text-muted-foreground">
                 students per score band (percentage of full marks)
@@ -307,75 +432,45 @@ function AnalyticsPage() {
 
             <section>
               <h2 className="section-title text-[0.9375rem] font-semibold tracking-tight">
-                8-Debugger Error Breakdown
+                Active Debugger Signals
               </h2>
               <p className="mono-token mt-3 text-[0.625rem] text-muted-foreground">
-                papers where each engine raised its signal (negation, sequence, synonym gaps…)
+                papers flagged by each active engine (Garbage · Negation · Synonym)
               </p>
-              <div className="mt-4 h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={debuggers} layout="vertical" margin={{ left: 8, right: 12 }}>
-                    <CartesianGrid
-                      stroke="var(--border)"
-                      strokeDasharray="3 3"
-                      horizontal={false}
-                    />
-                    <XAxis
-                      type="number"
-                      stroke="var(--muted-foreground)"
-                      fontSize={12}
-                      allowDecimals={false}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="label"
-                      width={128}
-                      stroke="var(--muted-foreground)"
-                      fontSize={11}
-                    />
-                    <Tooltip
-                      contentStyle={tooltipStyle}
-                      cursor={{ fill: "var(--secondary)" }}
-                      formatter={(value: number) => [`${value} papers`, "Signal"]}
-                    />
-                    <Bar dataKey="count" name="Papers" radius={[0, 2, 2, 0]}>
-                      {debuggers.map((d) => (
-                        <Cell key={d.key} fill={TONE_FILL[DEBUGGER_TONE[d.key] ?? "brand"]!} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+              <div className="mt-4 space-y-4">
+                {debuggers
+                  .filter((d) => ["garbage", "negation", "synonym"].includes(d.key))
+                  .map((d) => (
+                    <div key={d.key} className="rounded-lg border border-border p-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{d.label}</span>
+                        <span
+                          className="mono-token text-sm font-semibold"
+                          style={{ color: TONE_FILL[DEBUGGER_TONE[d.key] ?? "brand"] }}
+                        >
+                          {d.count}/{d.total} papers
+                        </span>
+                      </div>
+                      <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-secondary">
+                        <div
+                          className="h-full rounded-full transition-[width] duration-700"
+                          style={{
+                            width: `${Math.min(100, d.rate)}%`,
+                            background: TONE_FILL[DEBUGGER_TONE[d.key] ?? "brand"],
+                          }}
+                        />
+                      </div>
+                      <p className="mono-token mt-1.5 text-[0.6875rem] text-muted-foreground">
+                        {d.rate}% flag rate
+                      </p>
+                    </div>
+                  ))}
+                <p className="text-[0.6875rem] text-muted-foreground/60">
+                  IV Spelling · V Sequence · VI Vision · VII Density signals available in Phase 2
+                </p>
               </div>
             </section>
           </div>
-
-          {/* Tabular detail — debugger signal rates */}
-          <section className="mt-10">
-            <h2 className="section-title text-[0.9375rem] font-semibold tracking-tight">
-              Debugger Signal Rates
-            </h2>
-            <div className="mt-4 space-y-3">
-              {debuggers.map((d) => (
-                <div key={d.key}>
-                  <div className="flex items-center justify-between text-xs">
-                    <span>{d.label}</span>
-                    <span className="mono-token text-muted-foreground">
-                      {d.count}/{d.total} · {d.rate}%
-                    </span>
-                  </div>
-                  <div className="mt-1.5 h-1 overflow-hidden bg-secondary">
-                    <div
-                      className="h-full transition-[width] duration-700"
-                      style={{
-                        width: `${Math.min(100, d.rate)}%`,
-                        background: TONE_FILL[DEBUGGER_TONE[d.key] ?? "brand"],
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
         </>
       )}
     </AppShell>

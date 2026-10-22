@@ -325,8 +325,6 @@ export function AuthScreen({ initialTab = "signin" }: { initialTab?: "signin" | 
                   className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm outline-none focus:border-brand"
                 >
                   <option value="teacher">Teacher</option>
-                  <option value="department_head">Department Head</option>
-                  <option value="exam_controller">Exam Controller</option>
                 </select>
               </div>
 
