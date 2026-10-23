@@ -1,12 +1,25 @@
-"""Exam lifecycle contracts (PRD endpoints #3 dashboard / #4 setup / #5 rubric)."""
+import json
+import logging
+from typing import Any
+from uuid import UUID, uuid4
 
-from uuid import uuid4
-
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    Response,
+    UploadFile,
+    status,
+)
+from fastapi_cache.decorator import cache
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
+from app.core.cache import invalidate_cache_async
 from app.core.deps import can_view_cross_institution, get_current_user, get_owned_exam
 from app.database import get_db
 from app.models.exam import Exam, ExamStatus
@@ -25,6 +38,26 @@ from app.services.oss_storage import storage_service
 from app.services.rubric_service import extract_concepts
 from app.utils.pdf_tools import extract_text_or_decode
 
+logger = logging.getLogger(__name__)
+
+
+class UTF8JSONResponse(Response):
+    """Custom response serializer forcing ensure_ascii=False for proper Urdu Unicode transmission."""
+
+    media_type = "application/json; charset=utf-8"
+
+    def render(self, content: Any) -> bytes:
+        if isinstance(content, (bytes, bytearray)):
+            return bytes(content)
+        return json.dumps(
+            content,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=None,
+            separators=(",", ":"),
+        ).encode("utf-8")
+
+
 router = APIRouter()
 
 
@@ -33,6 +66,7 @@ router = APIRouter()
     response_model=DashboardResponse,
     summary="Dashboard metrics & recent exam logs",
 )
+@cache(expire=300, namespace="exams")
 async def list_exams(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -93,6 +127,7 @@ async def list_exams(
 @router.post(
     "/exam/setup",
     response_model=ExamSetupResponse,
+    response_class=UTF8JSONResponse,
     summary="Upload question paper + sample answer; auto-extract rubric",
 )
 async def exam_setup(
@@ -101,10 +136,25 @@ async def exam_setup(
     sample_answer_file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> ExamSetupResponse:
-    """Create a draft exam, archive uploads to OSS and run Qwen-2.5 extraction."""
+) -> Response:
+    """Create a draft exam, archive uploads to OSS and run Qwen3.8-Max / Vision extraction."""
     question_bytes = await question_file.read()
     sample_bytes = await sample_answer_file.read()
+
+    print("\n================================================================================")
+    print(f"[API: /exam/setup] Request received for exam: '{exam_title}'")
+    print(f"[API: /exam/setup] Question file: '{question_file.filename}' ({len(question_bytes)} bytes)")
+    print(f"[API: /exam/setup] Sample answer file: '{sample_answer_file.filename}' ({len(sample_bytes)} bytes)")
+    print("================================================================================")
+    logger.info(
+        "[API: /exam/setup] Incoming upload: title='%s', q_file='%s' (%d bytes), ans_file='%s' (%d bytes)",
+        exam_title,
+        question_file.filename,
+        len(question_bytes),
+        sample_answer_file.filename,
+        len(sample_bytes),
+    )
+
     for name, payload in (
         (question_file.filename or "question", question_bytes),
         (sample_answer_file.filename or "sample", sample_bytes),
@@ -142,10 +192,40 @@ async def exam_setup(
     sample_text = extract_text_or_decode(
         sample_bytes, sample_answer_file.filename or "s.pdf"
     )
+
     concepts, synonyms_map = await extract_concepts(
-        exam_title.strip(), question_text, sample_text
+        exam_title.strip(),
+        question_text=question_text,
+        sample_text=sample_text,
+        question_bytes=question_bytes,
+        sample_bytes=sample_bytes,
+        question_filename=question_file.filename or "q.pdf",
+        sample_filename=sample_answer_file.filename or "s.pdf",
     )
 
+    # Build schema-aligned ConceptItem instances matching React RubricStudio
+    concept_items: list[ConceptItem] = []
+    for c in concepts:
+        kw = c.get("keyword") or c.get("concept_name") or ""
+        try:
+            wt = float(c.get("weight") or c.get("weightage") or c.get("points") or 1.0)
+        except (TypeError, ValueError):
+            wt = 1.0
+        kw_syns = synonyms_map.get(kw, []) or c.get("keywords") or c.get("synonyms") or []
+        concept_items.append(
+            ConceptItem(
+                keyword=kw,
+                weight=wt,
+                concept_name=kw,
+                weightage=wt,
+                points=wt,
+                keywords=kw_syns,
+                synonyms=kw_syns,
+                criteria=c.get("criteria"),
+            )
+        )
+
+    # Persist in DB
     exam = Exam(
         exam_id=exam_id,
         user_id=current_user.user_id,
@@ -156,16 +236,66 @@ async def exam_setup(
     )
     rubric = Rubric(
         exam_id=exam_id,
-        concepts_json={"concepts": concepts, "synonyms": synonyms_map},
+        concepts_json={
+            "concepts": [c.model_dump() for c in concept_items],
+            "synonyms": synonyms_map,
+        },
     )
     db.add_all([exam, rubric])
     await db.flush()
 
-    return ExamSetupResponse(
-        exam_id=exam_id,
-        extracted_concepts=[ConceptItem(**c) for c in concepts],
-        synonyms=synonyms_map,
+    # Automatically invalidate cached exams list and rubrics
+    await invalidate_cache_async("exams", "rubrics")
+
+    # Construct complete payload covering both 'concepts' and 'extracted_concepts'
+    response_payload = {
+        "exam_id": str(exam_id),
+        "concepts": [c.model_dump() for c in concept_items],
+        "extracted_concepts": [c.model_dump() for c in concept_items],
+        "synonyms": synonyms_map,
+    }
+
+    raw_response_str = json.dumps(response_payload, ensure_ascii=False)
+    print("\n--------------------------------------------------------------------------------")
+    print(f"[API: /exam/setup] >>> EXACT RESPONSE PAYLOAD SENT TO FRONTEND (UTF-8, {len(concept_items)} concepts):")
+    print(raw_response_str)
+    print("--------------------------------------------------------------------------------\n")
+    logger.info("[API: /exam/setup] Response payload sent to frontend: %s", raw_response_str)
+
+    return UTF8JSONResponse(content=response_payload)
+
+
+@router.get(
+    "/exam/rubric",
+    summary="Fetch rubric concepts, weights, and sensitivity toggles for an exam",
+)
+@cache(expire=300, namespace="rubrics")
+async def get_rubric(
+    exam_id: UUID = Query(..., description="Exam id to fetch rubric for"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """Fetch stored rubric concepts and sensitivity toggles."""
+    exam = await get_owned_exam(db, exam_id, current_user)
+    result = await db.execute(
+        select(Rubric).where(Rubric.exam_id == exam.exam_id)
     )
+    rubric = result.scalar_one_or_none()
+    if rubric is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Rubric not found for this exam",
+        )
+    return {
+        "rubric_id": str(rubric.rubric_id),
+        "exam_id": str(rubric.exam_id),
+        "concepts": rubric.concepts,
+        "synonyms": rubric.synonyms,
+        "max_score": rubric.max_score,
+        "ignore_spelling": rubric.ignore_spelling,
+        "strict_order": rubric.strict_order,
+        "density_scoring": rubric.density_scoring,
+    }
 
 
 @router.put(
@@ -203,5 +333,8 @@ async def update_rubric(
     rubric.strict_order = payload.strict_order
     rubric.density_scoring = payload.density_scoring
     await db.flush()
+
+    # Automatically invalidate cached rubric, exams, and analytics
+    await invalidate_cache_async("rubrics", "exams", "analytics")
 
     return RubricUpdateResponse(status="updated", rubric_id=rubric.rubric_id)

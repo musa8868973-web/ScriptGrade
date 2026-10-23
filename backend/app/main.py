@@ -21,13 +21,18 @@ from app.database import engine, init_models
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    """Application lifecycle: ensure relational schema and demo data exist on startup."""
+    """Application lifecycle: ensure relational schema, demo data, and Redis cache exist."""
     await init_models()
     try:
         from seed import seed
+
         await seed()
-    except Exception as exc:
+    except Exception:
         pass
+
+    from app.core.cache import init_cache
+
+    await init_cache()
     yield
     await engine.dispose()
 

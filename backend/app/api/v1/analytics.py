@@ -3,6 +3,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Response
+from fastapi_cache.decorator import cache
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -104,6 +105,7 @@ async def export_analytics(
     response_model=AnalyticsSummary,
     summary="Chart-ready class analytics for one exam (single-subject view)",
 )
+@cache(expire=300, namespace="analytics")
 async def get_analytics_summary(
     exam_id: UUID = Query(..., description="Exam to aggregate"),
     db: AsyncSession = Depends(get_db),

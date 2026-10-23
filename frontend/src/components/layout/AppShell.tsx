@@ -67,13 +67,13 @@ export function AppShell({
     .join(" ");
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-goldenCream">
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
 
-      {/* ── Sidebar — Oxford navy ───────────────────────────── */}
+      {/* ── Sidebar — Royal Blue ───────────────────────────── */}
       <aside
         className={cn(
-          "sticky top-0 hidden h-screen shrink-0 flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 md:flex",
+          "sticky top-0 hidden h-screen shrink-0 flex-col bg-royalBlue text-white border-r border-royalBlue-800 transition-[width] duration-200 md:flex",
           collapsed ? "w-[72px]" : "w-[236px]",
         )}
       >
@@ -85,8 +85,8 @@ export function AppShell({
           />
           {!collapsed && (
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold tracking-tight">ScriptGrade</p>
-              <p className="mono-token truncate text-[0.625rem] text-sidebar-foreground/55">
+              <p className="truncate text-sm font-semibold tracking-tight text-white">ScriptGrade</p>
+              <p className="mono-token truncate text-[0.625rem] text-white/60">
                 8-DEBUGGER ENGINE
               </p>
             </div>
@@ -104,8 +104,8 @@ export function AppShell({
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
                   active
-                    ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/65 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                    ? "bg-royalBlue-800 font-medium text-white shadow-xs"
+                    : "text-white/70 hover:bg-white/10 hover:text-white",
                 )}
               >
                 <Icon size={16} className="shrink-0" />
@@ -119,7 +119,7 @@ export function AppShell({
           <button
             onClick={() => setCollapsed((c) => !c)}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 transition-colors hover:bg-white/10 hover:text-white"
           >
             {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
             {!collapsed && "Collapse"}
@@ -129,7 +129,7 @@ export function AppShell({
 
       {/* ── Main column ─────────────────────────────────────── */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-card px-4 md:px-6">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-royalBlue-800/40 bg-royalBlue text-white px-4 md:px-6 shadow-sm">
           <Link
             to="/dashboard"
             className="flex items-center gap-2 md:hidden"
@@ -140,40 +140,40 @@ export function AppShell({
               alt="ScriptGrade Logo"
               className="h-8 w-auto object-contain"
             />
-            <span className="text-sm font-semibold tracking-tight">ScriptGrade</span>
+            <span className="text-sm font-semibold tracking-tight text-white">ScriptGrade</span>
           </Link>
 
-          <span className="hidden items-center gap-1.5 text-[0.6875rem] font-medium tracking-wide text-muted-foreground uppercase sm:inline-flex">
-            <Sparkles size={11} /> Qwen3.8-Max
+          <span className="hidden items-center gap-1.5 text-[0.6875rem] font-medium tracking-wide text-white/75 uppercase sm:inline-flex">
+            <Sparkles size={11} className="text-amber-300" /> Qwen3.8-Max
           </span>
 
           <button
             onClick={() => setPaletteOpen(true)}
-            className="ml-auto hidden items-center gap-2 rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground sm:flex"
+            className="ml-auto hidden items-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-xs text-white/80 transition-colors hover:bg-white/15 hover:text-white sm:flex"
           >
             <CommandIcon size={13} /> Quick actions
-            <kbd className="mono-token text-[0.625rem] text-muted-foreground/70">⌘K</kbd>
+            <kbd className="mono-token text-[0.625rem] text-white/60">⌘K</kbd>
           </button>
 
           <button
             aria-label="Notifications"
-            className="relative ml-auto grid size-8 place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground sm:ml-0"
+            className="relative ml-auto grid size-8 place-items-center rounded-md text-white/80 transition-colors hover:bg-white/10 hover:text-white sm:ml-0"
           >
             <Bell size={16} />
-            <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-warn" />
+            <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-amber-400" />
           </button>
 
-          <div className="flex items-center gap-2.5 border-l border-border pl-3">
+          <div className="flex items-center gap-2.5 border-l border-white/20 pl-3">
             <img
               src="/ScriptGrade_Logo.png"
               alt="ScriptGrade Logo"
               className="size-7 rounded-[6px] object-contain"
             />
             <div className="hidden leading-tight lg:block">
-              <p className="max-w-[130px] truncate text-xs font-medium">
+              <p className="max-w-[130px] truncate text-xs font-medium text-white">
                 {teacher?.name ?? "Guest"}
               </p>
-              <p className="flex items-center gap-1 text-[0.625rem] text-muted-foreground">
+              <p className="flex items-center gap-1 text-[0.625rem] text-white/70">
                 <ShieldCheck size={9} /> {roleLabel}
               </p>
             </div>
@@ -183,7 +183,7 @@ export function AppShell({
                 clearToken();
                 navigate({ to: "/login" });
               }}
-              className="grid size-7 place-items-center rounded-md text-muted-foreground transition-colors hover:text-foreground"
+              className="grid size-7 place-items-center rounded-md text-white/80 transition-colors hover:bg-white/10 hover:text-white"
             >
               <LogOut size={14} />
             </button>

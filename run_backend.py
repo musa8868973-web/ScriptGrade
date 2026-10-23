@@ -99,6 +99,7 @@ if not is_port_open(PORT_PG):
         time.sleep(0.3)
     if not ready:
         raise RuntimeError("Timed out waiting for PostgreSQL to start.")
+    time.sleep(1.5)  # Allow database recovery / startup to complete cleanly
     print(f"      [OK] PostgreSQL listening on 127.0.0.1:{PORT_PG}")
 else:
     print(f"[1/3] PostgreSQL already active on port {PORT_PG}")

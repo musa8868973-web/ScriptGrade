@@ -19,7 +19,8 @@ passlib>=1.7.4,<2.0
 bcrypt==4.0.1
 
 celery>=5.4,<6.0
-redis>=5.2,<6.0
+redis>=4.6.0,<6.0
+fastapi-cache2[redis]>=0.2.2,<1.0
 
 httpx>=0.28,<1.0
 PyMuPDF>=1.25,<2.0

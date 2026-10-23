@@ -24,6 +24,7 @@ from app.services.ai_client import OCRResult, ai_client
 from app.services.evaluation import Toggles, VisualEvidence, evaluate_answer
 from app.services.oss_storage import storage_service
 from app.utils.pdf_tools import extract_text_from_pdf
+from app.core.cache import invalidate_cache_sync
 from app.workers.database import worker_session
 
 logger = logging.getLogger(__name__)
@@ -208,5 +209,8 @@ def process_paper_task(self, paper_id: str) -> dict[str, str]:
             batch = session.get(BatchUpload, paper.batch_id)
             if batch is not None:
                 _advance_batch(session, batch, exam)
+
+    # Invalidate relevant Redis cache keys (analytics, exams, papers)
+    invalidate_cache_sync("analytics", "exams", "papers")
 
     return {"status": "evaluated", "paper_id": paper_id}

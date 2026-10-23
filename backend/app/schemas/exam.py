@@ -32,18 +32,25 @@ class DashboardResponse(BaseModel):
 
 
 class ConceptItem(BaseModel):
-    """A single weighted magic keyword."""
+    """A single weighted magic keyword compatible with both backend & React RubricStudio."""
 
     keyword: str = Field(min_length=1, max_length=120)
     weight: float = Field(gt=0, le=10)
+    concept_name: str | None = None
+    weightage: float | None = None
+    points: float | None = None
+    keywords: list[str] = Field(default_factory=list)
+    synonyms: list[str] = Field(default_factory=list)
+    criteria: str | None = None
 
 
 class ExamSetupResponse(BaseModel):
-    """Qwen-2.5 auto-extraction result (endpoint #4)."""
+    """Qwen-2.5 / Qwen3.8-Max auto-extraction result (endpoint #4)."""
 
     exam_id: UUID
-    extracted_concepts: list[ConceptItem]
-    synonyms: dict[str, list[str]]
+    extracted_concepts: list[ConceptItem] = Field(default_factory=list)
+    concepts: list[ConceptItem] = Field(default_factory=list)
+    synonyms: dict[str, list[str]] = Field(default_factory=dict)
 
 
 class RubricUpdateRequest(BaseModel):

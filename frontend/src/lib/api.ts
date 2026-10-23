@@ -326,14 +326,23 @@ const mapExamsList = (d: BackendExamsResponse): ExamsListResponse => ({
   })),
 });
 
-const mapExamSetup = (d: BackendExamSetupResponse): ExamSetupResponse => ({
-  exam_id: String(d.exam_id),
-  concepts: d.extracted_concepts.map((c) => ({
-    keyword: c.keyword,
-    points: c.weight,
-    synonyms: d.synonyms[c.keyword] ?? [],
-  })),
-});
+const mapExamSetup = (d: any): ExamSetupResponse => {
+  const rawList = Array.isArray(d.concepts) && d.concepts.length > 0 ? d.concepts : (d.extracted_concepts || []);
+  const synMap = d.synonyms || {};
+  return {
+    exam_id: String(d.exam_id),
+    concepts: rawList.map((c: any) => {
+      const kw = c.keyword || c.concept_name || "";
+      const pts = Number(c.points ?? c.weight ?? c.weightage ?? 5);
+      const syns = synMap[kw] || synMap[c.concept_name] || c.keywords || c.synonyms || [];
+      return {
+        keyword: kw,
+        points: isNaN(pts) ? 5 : pts,
+        synonyms: Array.isArray(syns) ? syns : [],
+      };
+    }),
+  };
+};
 
 /** §13 diagnostic JSONB → the 8-debugger UI payload (defensive defaults). */
 const mapDiagnostics = (diag: BackendDiagnostics): PaperDetail["debuggers"] => {

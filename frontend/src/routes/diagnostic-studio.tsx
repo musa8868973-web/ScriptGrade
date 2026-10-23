@@ -221,7 +221,7 @@ function DiagnosticStudio() {
                 className={cn(
                   "mono-token shrink-0 rounded-md px-2.5 py-1.5 text-xs transition-colors",
                   p.student_id === active
-                    ? "bg-success font-medium text-success-foreground"
+                    ? "bg-royalBlue font-medium text-white shadow-xs"
                     : "pill-soft hover:text-foreground",
                 )}
               >

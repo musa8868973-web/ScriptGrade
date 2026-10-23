@@ -528,7 +528,7 @@ function IngestionPage() {
                 className={cn(
                   "mono-token rounded-md px-3 py-1.5 text-xs transition-colors",
                   mode === m || (m === "one-by-one" && mode === "single")
-                    ? "bg-success font-medium text-success-foreground"
+                    ? "bg-royalBlue font-medium text-white shadow-xs"
                     : "pill-soft text-muted-foreground hover:text-foreground",
                 )}
               >

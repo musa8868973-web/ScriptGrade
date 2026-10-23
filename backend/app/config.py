@@ -40,8 +40,10 @@ class Settings(BaseSettings):
         "postgresql+asyncpg://postgres:postgres@localhost:5432/scriptgrade"
     )
     db_echo: bool = False
-    db_pool_size: int = 10
-    db_max_overflow: int = 20
+    db_pool_size: int = 20
+    db_max_overflow: int = 50
+    db_pool_recycle: int = 300
+    db_pool_timeout: int = 30
     pgvector_enabled: bool = True
 
     # --- JWT / OAuth2 security ---------------------------------------------

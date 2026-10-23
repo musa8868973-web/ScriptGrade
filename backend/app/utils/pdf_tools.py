@@ -46,6 +46,57 @@ def is_image_content(data: bytes, filename: str = "") -> bool:
     return ext in (".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif", ".tiff")
 
 
+def convert_pdf_to_images(
+    data: bytes,
+    dpi: int = 150,
+    max_pages: int = 6,
+    image_format: str = "png",
+) -> list[bytes]:
+    """Convert PDF pages to image byte payloads (PNG/JPEG) via PyMuPDF.
+
+    This preserves complex typography and RTL scripts (e.g. Urdu Nastaliq)
+    that standard PDF text layer extractors frequently corrupt.
+    """
+    if not is_pdf_content(data):
+        return []
+    images: list[bytes] = []
+    try:
+        with fitz.open(stream=data, filetype="pdf") as doc:
+            page_count = min(doc.page_count, max_pages)
+            logger.info(
+                "convert_pdf_to_images: rendering %d page(s) to %s at %d DPI",
+                page_count,
+                image_format,
+                dpi,
+            )
+            for page_index in range(page_count):
+                page = doc.load_page(page_index)
+                pix = page.get_pixmap(dpi=dpi)
+                images.append(pix.tobytes(image_format))
+        return images
+    except Exception as exc:
+        logger.error("convert_pdf_to_images failed: %s", exc)
+        return []
+
+
+def extract_document_images(
+    data: bytes,
+    filename: str = "",
+    max_pages: int = 6,
+) -> list[bytes]:
+    """Extract page images from a PDF or return a raw uploaded image directly.
+
+    Designed for multimodal vision ingestion of question papers and answer keys.
+    """
+    if not data:
+        return []
+    if is_pdf_content(data) or filename.lower().endswith(".pdf"):
+        return convert_pdf_to_images(data, max_pages=max_pages)
+    if is_image_content(data, filename):
+        return [data]
+    return []
+
+
 def convert_image_to_pdf(data: bytes, filename: str = "image.png") -> bytes:
     """Convert a single image (PNG/JPG/WEBP) into a single-page PDF document."""
     ext = Path(filename).suffix.lower().lstrip(".") or "png"

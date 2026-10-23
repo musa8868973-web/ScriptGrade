@@ -12,6 +12,9 @@ from fastapi import (
     UploadFile,
     status,
 )
+from fastapi_cache.decorator import cache
+from app.core.cache import invalidate_cache_async
+
 logger = logging.getLogger(__name__)
 
 from sqlalchemy import func, select
@@ -169,6 +172,9 @@ async def batch_upload(
             detail=f"Evaluation pipeline failed to dispatch: {exc}",
         ) from exc
 
+    # Invalidate cached exam listing and papers
+    await invalidate_cache_async("exams", "papers")
+
     return BatchUploadResponse(
         batch_id=batch.batch_id,
         total_papers=batch.total_papers,
@@ -229,6 +235,7 @@ async def get_paper_queue(
     response_model=PaperDetailResponse,
     summary="Full evaluation breakdown + 8-debugger diagnostics",
 )
+@cache(expire=300, namespace="papers")
 async def get_paper_detail(
     student_id: str,
     exam_id: UUID | None = None,
@@ -290,6 +297,9 @@ async def override_paper_score(
     paper.moderation_note = payload.moderation_note
     await db.flush()
 
+    # Automatically invalidate cached analytics, exams, and paper detail
+    await invalidate_cache_async("analytics", "exams", "papers")
+
     return OverrideResponse(status="override_applied", updated_score=payload.new_score)
 
 
@@ -320,6 +330,9 @@ async def set_paper_identity(
         )
     paper.student_name = name[:255]
     await db.flush()
+
+    # Invalidate paper cache
+    await invalidate_cache_async("papers")
 
     return PaperIdentityResponse(
         paper_id=paper.paper_id,

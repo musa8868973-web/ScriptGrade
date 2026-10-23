@@ -26,6 +26,46 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --font-nastaliq: "Noto Nastaliq Urdu", "Noto Naskh Arabic", serif;
 
+  --color-royal-blue: var(--royalBlue);
+  --color-royal-blue-50: #eff6ff;
+  --color-royal-blue-100: #dbeafe;
+  --color-royal-blue-200: #bfdbfe;
+  --color-royal-blue-300: #93c5fd;
+  --color-royal-blue-400: #60a5fa;
+  --color-royal-blue-500: #3b82f6;
+  --color-royal-blue-600: #2563eb;
+  --color-royal-blue-700: #1d4ed8;
+  --color-royal-blue-800: #1e40af;
+  --color-royal-blue-900: #172554;
+  --color-royal-blue-950: #0f172a;
+  --color-royalBlue: var(--royalBlue);
+  --color-royalBlue-50: #eff6ff;
+  --color-royalBlue-100: #dbeafe;
+  --color-royalBlue-200: #bfdbfe;
+  --color-royalBlue-300: #93c5fd;
+  --color-royalBlue-400: #60a5fa;
+  --color-royalBlue-500: #3b82f6;
+  --color-royalBlue-600: #2563eb;
+  --color-royalBlue-700: #1d4ed8;
+  --color-royalBlue-800: #1e40af;
+  --color-royalBlue-900: #172554;
+  --color-royalBlue-950: #0f172a;
+
+  --color-golden-cream: var(--goldenCream);
+  --color-golden-cream-50: #ffffff;
+  --color-golden-cream-100: #fdfbf7;
+  --color-golden-cream-200: #f9f6ee;
+  --color-golden-cream-300: #f3ede0;
+  --color-golden-cream-400: #e7dcbf;
+  --color-golden-cream-500: #d4c39b;
+  --color-goldenCream: var(--goldenCream);
+  --color-goldenCream-50: #ffffff;
+  --color-goldenCream-100: #fdfbf7;
+  --color-goldenCream-200: #f9f6ee;
+  --color-goldenCream-300: #f3ede0;
+  --color-goldenCream-400: #e7dcbf;
+  --color-goldenCream-500: #d4c39b;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -75,62 +115,66 @@
 :root {
   --radius: 6px;
 
-  /* Paper canvas + ink */
-  --background: oklch(0.984 0.003 247.858); /* #F8FAFC */
-  --foreground: oklch(0.208 0.042 265.755); /* #0F172A */
-  --card: oklch(1 0 0); /* #FFFFFF */
-  --card-foreground: oklch(0.208 0.042 265.755);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.208 0.042 265.755);
+  /* Royal Blue and Golden Cream Aesthetic */
+  --royalBlue: #172554;
+  --goldenCream: #fdfbf7;
 
-  --primary: oklch(0.546 0.245 262.881); /* #2563EB Scholar Blue */
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.968 0.007 247.896); /* #F1F5F9 */
-  --secondary-foreground: oklch(0.372 0.044 257.287); /* #334155 */
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.446 0.043 257.281); /* #475569 graphite */
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.505 0.213 27.518); /* #B91C1C */
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.929 0.013 255.508); /* #E2E8F0 hairline */
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.546 0.245 262.881);
+  /* Paper canvas + ink: Set default application background to golden cream */
+  --background: #fdfbf7; /* Golden Cream */
+  --foreground: #0f172a; /* Deep Navy/Charcoal */
+  --card: #ffffff; /* Crisp surface */
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
 
-  --brand: oklch(0.546 0.245 262.881); /* Scholar Blue */
-  --brand-light: oklch(0.488 0.217 264.376); /* deeper blue for text on paper */
-  --success: oklch(0.696 0.17 162.48); /* #10B981 emerald — progress & positive actions */
-  --success-foreground: oklch(1 0 0);
-  --pass: oklch(0.448 0.119 151.328); /* #166534 sage green */
-  --alert: oklch(0.505 0.213 27.518); /* #B91C1C */
-  --warn: oklch(0.554 0.152 60.5); /* #D97706 muted amber */
-  --vision: oklch(0.48 0.09 224); /* muted slate-teal */
-  --glass: oklch(1 0 0);
+  --primary: #172554; /* Royal Blue Primary */
+  --primary-foreground: #ffffff;
+  --secondary: #f5f2eb; /* Soft Golden Cream tone */
+  --secondary-foreground: #1e293b;
+  --muted: #f5f2eb;
+  --muted-foreground: #475569;
+  --accent: #f5f2eb;
+  --accent-foreground: #0f172a;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --border: #e8e2d5; /* Subtle warm border for golden cream */
+  --input: #e8e2d5;
+  --ring: #172554;
 
-  --chart-1: oklch(0.546 0.245 262.881);
-  --chart-2: oklch(0.448 0.119 151.328);
-  --chart-3: oklch(0.48 0.09 224);
-  --chart-4: oklch(0.554 0.152 60.5);
-  --chart-5: oklch(0.505 0.213 27.518);
+  --brand: #172554; /* Royal Blue */
+  --brand-light: #1e40af;
+  --success: #10b981;
+  --success-foreground: #ffffff;
+  --pass: #166534;
+  --alert: #b91c1c;
+  --warn: #d97706;
+  --vision: #0284c7;
+  --glass: #ffffff;
 
-  /* Oxford navy navigation */
-  --sidebar: oklch(0.208 0.042 265.755); /* #0F172A */
-  --sidebar-foreground: oklch(0.929 0.013 255.508);
-  --sidebar-primary: oklch(0.546 0.245 262.881);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.279 0.041 260.031); /* slate-blue hover */
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(0.279 0.041 260.031);
-  --sidebar-ring: oklch(0.546 0.245 262.881);
+  --chart-1: #172554;
+  --chart-2: #166534;
+  --chart-3: #0284c7;
+  --chart-4: #d97706;
+  --chart-5: #b91c1c;
+
+  /* Royal Blue Navigation */
+  --sidebar: #172554; /* Royal Blue */
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #38bdf8;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e40af; /* Lighter royal blue hover/active */
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #1e3a8a;
+  --sidebar-ring: #60a5fa;
 
   /* Flat system — shadows exist only as hairlines */
   --shadow-sm: none;
   --shadow-md: none;
   --shadow-lg: none;
-  --shadow-brand: 0 0 0 2px oklch(0.546 0.245 262.881 / 0.18);
+  --shadow-brand: 0 0 0 2px rgba(23, 37, 84, 0.18);
 
-  --pill-bg: oklch(0.968 0.007 247.896); /* #F1F5F9 */
-  --pill-fg: oklch(0.372 0.044 257.287); /* #334155 */
+  --pill-bg: #f5f2eb; /* Warm cream inactive pill */
+  --pill-fg: #334155;
 }
 
 @layer base {

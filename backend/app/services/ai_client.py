@@ -130,20 +130,70 @@ class DashScopeClient:
             visual_elements=elements,
         )
 
+    async def extract_vision_json(
+        self,
+        images: list[bytes],
+        prompt: str,
+        system_prompt: str | None = None,
+    ) -> dict[str, Any]:
+        """Send page images directly to Qwen Vision (Qwen3.8-Max / Qwen-VL) to extract structured JSON.
+
+        Preserves non-Latin scripts (Urdu, Arabic) by using visual OCR features
+        rather than corrupted text layers. Enforces response_format={"type": "json_object"}
+        and strict UTF-8 serialization.
+        """
+        if not images:
+            return {}
+
+        image_contents: list[dict[str, Any]] = []
+        for img in images:
+            encoded = base64.b64encode(img).decode("ascii")
+            mime = "image/png"
+            if img.startswith(b"\xff\xd8\xff"):
+                mime = "image/jpeg"
+            elif img.startswith(b"RIFF"):
+                mime = "image/webp"
+            image_contents.append({"image": f"data:{mime};base64,{encoded}"})
+
+        # Append prompt text
+        image_contents.append({"text": prompt})
+
+        messages: list[dict[str, Any]] = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": image_contents})
+
+        payload = {
+            "model": self._vl_model,
+            "input": {"messages": messages},
+            "parameters": {
+                "result_format": "message",
+                "temperature": 0.1,
+                "response_format": {"type": "json_object"},
+            },
+        }
+
+        data = await self._post_with_retry(
+            f"{_DASHSCOPE_BASE}/aigc/multimodal-generation/generation", payload
+        )
+        raw = self._extract_text(data)
+        return self._parse_json_lenient(raw)
+
     # -------------------------------------------------------------- plumbing
 
     async def _post_with_retry(self, url: str, payload: dict[str, Any]) -> dict[str, Any]:
         if not self.is_configured:
             raise AIClientError("QWEN_API_KEY is not configured")
+        raw_body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         headers = {
             "Authorization": f"Bearer {self._api_key}",
-            "Content-Type": "application/json",
+            "Content-Type": "application/json; charset=utf-8",
         }
         last_error: Exception | None = None
         for attempt in range(1, _MAX_RETRIES + 1):
             try:
                 async with httpx.AsyncClient(timeout=self._timeout) as client:
-                    response = await client.post(url, json=payload, headers=headers)
+                    response = await client.post(url, content=raw_body, headers=headers)
                 if response.status_code == 429 or response.status_code >= 500:
                     raise AIClientError(
                         f"DashScope transient error {response.status_code}"
@@ -153,6 +203,7 @@ class DashScopeClient:
                         f"DashScope rejected request: {response.status_code} "
                         f"{response.text[:300]}"
                     )
+                response.encoding = "utf-8"
                 return response.json()
             except (httpx.HTTPError, AIClientError) as exc:
                 last_error = exc
@@ -184,23 +235,49 @@ class DashScopeClient:
 
     @staticmethod
     def _parse_json_lenient(raw: str) -> dict[str, Any]:
-        """Parse model output into a dict, tolerating fences and prose."""
-        if not raw:
+        """Parse model output into a dict, tolerating fences and prose without silent swallowing."""
+        if not raw or not raw.strip():
+            logger.error("[AI Parser] Model returned completely empty output.")
+            print("[AI Parser] ERROR: Model returned completely empty output.")
             return {}
         try:
             parsed = json.loads(raw)
             if isinstance(parsed, dict):
                 return parsed
-        except json.JSONDecodeError:
-            pass
+            if isinstance(parsed, list):
+                return {"concepts": parsed}
+        except json.JSONDecodeError as exc:
+            logger.warning(
+                "[AI Parser] Direct json.loads failed (%s). Attempting regex block extraction. Full raw text:\n%s",
+                exc,
+                raw,
+            )
+            print(f"[AI Parser] WARNING: Direct json.loads failed ({exc}). Full raw text:\n{raw}")
+
         match = _JSON_BLOCK_RE.search(raw)
         if match:
             try:
                 parsed = json.loads(match.group(0))
                 if isinstance(parsed, dict):
                     return parsed
-            except json.JSONDecodeError:
-                logger.warning("Model returned unparseable JSON block; ignoring.")
+                if isinstance(parsed, list):
+                    return {"concepts": parsed}
+            except json.JSONDecodeError as exc:
+                logger.error(
+                    "[AI Parser] Extracted JSON block failed parsing (%s).\nExtracted Block:\n%s\nFull Raw Output:\n%s",
+                    exc,
+                    match.group(0),
+                    raw,
+                )
+                print(
+                    f"[AI Parser] ERROR: Extracted JSON block failed parsing ({exc}).\nExtracted Block:\n{match.group(0)}\nFull Raw Output:\n{raw}"
+                )
+        else:
+            logger.error(
+                "[AI Parser] No JSON structure found in raw response. Full raw output:\n%s",
+                raw,
+            )
+            print(f"[AI Parser] ERROR: No JSON structure found in raw response. Full raw output:\n{raw}")
         return {}
 
 
