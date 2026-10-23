@@ -79,9 +79,9 @@ export function AppShell({
       >
         <div className="flex h-16 items-center gap-2.5 px-5">
           <img
-            src="/logo.png"
-            alt="ScriptGrade logo"
-            className="size-[18px] shrink-0 rounded-[4px]"
+            src="/ScriptGrade_Logo.png"
+            alt="ScriptGrade Logo"
+            className="h-8 w-auto shrink-0 object-contain"
           />
           {!collapsed && (
             <div className="min-w-0">
@@ -135,7 +135,12 @@ export function AppShell({
             className="flex items-center gap-2 md:hidden"
             aria-label="ScriptGrade home"
           >
-            <img src="/logo.png" alt="" className="size-[18px] rounded-[4px]" />
+            <img
+              src="/ScriptGrade_Logo.png"
+              alt="ScriptGrade Logo"
+              className="h-8 w-auto object-contain"
+            />
+            <span className="text-sm font-semibold tracking-tight">ScriptGrade</span>
           </Link>
 
           <span className="hidden items-center gap-1.5 text-[0.6875rem] font-medium tracking-wide text-muted-foreground uppercase sm:inline-flex">
@@ -159,7 +164,11 @@ export function AppShell({
           </button>
 
           <div className="flex items-center gap-2.5 border-l border-border pl-3">
-            <img src="/logo.png" alt="" className="size-7 rounded-[6px]" />
+            <img
+              src="/ScriptGrade_Logo.png"
+              alt="ScriptGrade Logo"
+              className="size-7 rounded-[6px] object-contain"
+            />
             <div className="hidden leading-tight lg:block">
               <p className="max-w-[130px] truncate text-xs font-medium">
                 {teacher?.name ?? "Guest"}

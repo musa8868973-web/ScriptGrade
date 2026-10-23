@@ -156,13 +156,11 @@ export function AuthScreen({ initialTab = "signin" }: { initialTab?: "signin" | 
       <section className="relative flex flex-col justify-between overflow-hidden border-r border-border bg-[#EFF6FF] p-8 md:p-12">
         <div className="relative">
           <div className="flex items-center gap-3">
-            <div className="grid size-10 place-items-center rounded-md border border-border">
-              <img
-                src="/logo.png"
-                alt="ScriptGrade logo"
-                className="size-6 rounded-[5px]"
-              />
-            </div>
+            <img
+              src="/ScriptGrade_Logo.png"
+              alt="ScriptGrade Logo"
+              className="h-10 w-auto object-contain"
+            />
             <div>
               <p className="font-display text-lg font-semibold tracking-tight">ScriptGrade</p>
               <p className="mono-token text-[0.625rem] text-muted-foreground">

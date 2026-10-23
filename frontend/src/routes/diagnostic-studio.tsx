@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, Save, ScanEye, ScanText } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Loader2, Save, ScanEye, ScanText, Search } from "lucide-react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/layout/AppShell";
 import { LanguageBadge, PaperStatusBadge, SourceBadge } from "@/components/badges";
 import { DEBUGGERS, DebuggerTabContent, toneClasses } from "@/components/debuggers/DebuggerPanel";
@@ -71,6 +72,36 @@ function DiagnosticStudio() {
   const papers = useMemo(() => queue?.papers ?? [], [queue]);
 
   const [active, setActive] = useState<string | null>(student_id ?? null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return;
+
+    // Cross-reference input string against loaded batch records (student_name or student_id)
+    const match = papers.find((p) => {
+      const name = (p.student_name ?? "").toLowerCase();
+      const id = p.student_id.toLowerCase();
+      return name === query || name.includes(query) || id === query || id.includes(query);
+    });
+
+    if (match) {
+      setActive(match.student_id);
+      useGradeStore.getState().setActiveStudent(match.student_id);
+      if (match.scanned_image_url) {
+        useGradeStore.getState().setStudentPaper({
+          studentId: match.student_id,
+          url: match.scanned_image_url,
+        });
+      }
+      toast.success(`Switched to ${match.student_name ?? match.student_id}`);
+      setSearchQuery("");
+    } else {
+      toast.error("Student record not found in the current batch.");
+    }
+  };
+
   // Keep the active paper driven by the URL `student_id` param so the detail
   // query resolves that record. The backend resolves a direct UUID id first and
   // falls back to the `student_identifier` when that fetch fails.
@@ -151,22 +182,53 @@ function DiagnosticStudio() {
       }
     >
       <div className="px-4 pt-5 md:px-6">
-        {/* Paper selector */}
-        <div className="mb-5 flex gap-1.5 overflow-x-auto pb-1">
-          {papers.slice(0, 24).map((p) => (
+        {/* Paper selector & Search bar */}
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          <form
+            onSubmit={handleSearch}
+            className="flex items-center gap-1.5"
+          >
+            <div className="relative">
+              <Search
+                size={14}
+                className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search Student..."
+                className="mono-token h-8 w-44 rounded-md border border-border bg-background pl-8 pr-2.5 text-xs outline-none transition-all placeholder:text-muted-foreground focus:w-56 focus:border-brand focus:ring-1 focus:ring-brand"
+              />
+            </div>
             <button
-              key={p.id}
-              onClick={() => setActive(p.student_id)}
-              className={cn(
-                "mono-token shrink-0 rounded-md px-2.5 py-1.5 text-xs transition-colors",
-                p.student_id === active
-                  ? "bg-success font-medium text-success-foreground"
-                  : "pill-soft hover:text-foreground",
-              )}
+              type="submit"
+              className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-secondary/80 px-2.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
             >
-              {p.student_name ?? p.student_id}
+              <Search size={12} />
+              <span>Search</span>
             </button>
-          ))}
+          </form>
+
+          <div className="hidden h-4 w-px bg-border sm:block" />
+
+          {/* Student name pills */}
+          <div className="flex flex-1 items-center gap-1.5 overflow-x-auto pb-1">
+            {papers.slice(0, 24).map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setActive(p.student_id)}
+                className={cn(
+                  "mono-token shrink-0 rounded-md px-2.5 py-1.5 text-xs transition-colors",
+                  p.student_id === active
+                    ? "bg-success font-medium text-success-foreground"
+                    : "pill-soft hover:text-foreground",
+                )}
+              >
+                {p.student_name ?? p.student_id}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -234,6 +296,111 @@ function DiagnosticStudio() {
           {/* ── Right: 8-debugger inline list ───────────────── */}
           <div className="col-span-12 lg:col-span-7">
             <div className="space-y-8 p-4 md:p-6">
+              {/* ── Dedicated 3-Frameworks Metrics Panel ── */}
+              <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex size-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+                      <span className="relative inline-flex size-2 rounded-full bg-success" />
+                    </span>
+                    <h3 className="text-xs font-semibold tracking-wide uppercase text-foreground">
+                      Active Frameworks Execution Status
+                    </h3>
+                  </div>
+                  <span className="mono-token rounded bg-secondary px-2 py-0.5 text-[0.625rem] font-medium text-muted-foreground">
+                    Priority Pipeline (3 Active)
+                  </span>
+                </div>
+
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  {/* Framework 1: Synonym Matcher */}
+                  <div className="rounded-lg border border-border/80 bg-background/70 p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[0.6875rem] font-medium text-muted-foreground">
+                        Synonym Matcher
+                      </span>
+                      <span className="mono-token inline-flex items-center gap-1 rounded bg-pass/10 px-1.5 py-0.5 text-[0.625rem] font-medium text-pass">
+                        <CheckCircle2 size={10} /> Active
+                      </span>
+                    </div>
+                    <p className="mono-token mt-2 text-lg font-semibold text-foreground">
+                      {paper.debuggers.synonym.resolved}
+                      <span className="text-xs font-normal text-muted-foreground"> resolved</span>
+                    </p>
+                    <p className="mt-1 truncate text-[0.6875rem] text-muted-foreground">
+                      {paper.debuggers.synonym.matches.length > 0
+                        ? `${paper.debuggers.synonym.matches.length} concept match(es)`
+                        : "Semantic vector search"}
+                    </p>
+                  </div>
+
+                  {/* Framework 2: Negation Engine */}
+                  <div className="rounded-lg border border-border/80 bg-background/70 p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[0.6875rem] font-medium text-muted-foreground">
+                        Negation Engine
+                      </span>
+                      <span
+                        className={cn(
+                          "mono-token inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[0.625rem] font-medium",
+                          paper.debuggers.negation.flagged
+                            ? "bg-alert/10 text-alert"
+                            : "bg-pass/10 text-pass",
+                        )}
+                      >
+                        {paper.debuggers.negation.flagged ? (
+                          <AlertTriangle size={10} />
+                        ) : (
+                          <CheckCircle2 size={10} />
+                        )}
+                        {paper.debuggers.negation.flagged ? "Flagged" : "Active / Verified"}
+                      </span>
+                    </div>
+                    <p className="mono-token mt-2 text-lg font-semibold text-foreground">
+                      {paper.debuggers.negation.tokens_scanned.length}
+                      <span className="text-xs font-normal text-muted-foreground"> tokens scanned</span>
+                    </p>
+                    <p className="mt-1 truncate text-[0.6875rem] text-muted-foreground">
+                      {paper.debuggers.negation.flagged
+                        ? "Polarity inversion caught"
+                        : "Zero negation violations"}
+                    </p>
+                  </div>
+
+                  {/* Framework 3: Anti-Fluff Scorer */}
+                  <div className="rounded-lg border border-border/80 bg-background/70 p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[0.6875rem] font-medium text-muted-foreground">
+                        Anti-Fluff Scorer
+                      </span>
+                      <span
+                        className={cn(
+                          "mono-token inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[0.625rem] font-medium",
+                          paper.debuggers.garbage.flagged
+                            ? "bg-alert/10 text-alert"
+                            : "bg-pass/10 text-pass",
+                        )}
+                      >
+                        {paper.debuggers.garbage.flagged ? (
+                          <AlertTriangle size={10} />
+                        ) : (
+                          <CheckCircle2 size={10} />
+                        )}
+                        {paper.debuggers.garbage.flagged ? "Padding Flagged" : "Active / Clean"}
+                      </span>
+                    </div>
+                    <p className="mono-token mt-2 text-lg font-semibold text-foreground">
+                      {(paper.debuggers.garbage.relevance_score * 100).toFixed(0)}%
+                      <span className="text-xs font-normal text-muted-foreground"> relevance</span>
+                    </p>
+                    <p className="mt-1 truncate text-[0.6875rem] text-muted-foreground">
+                      {paper.debuggers.garbage.notes || "Density & fluff filter"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <div className="section-title">
                   <ScanEye size={15} className="text-brand" />

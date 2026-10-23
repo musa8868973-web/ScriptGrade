@@ -23,6 +23,7 @@ import { DEBUGGERS } from "@/components/debuggers/DebuggerPanel";
 import { SheetViewer } from "@/components/SheetViewer";
 import {
   useBatchUpload,
+  useExams,
   useOverride,
   usePaper,
   usePaperQueue,
@@ -30,7 +31,7 @@ import {
 } from "@/lib/queries";
 import { useGradeStore } from "@/stores/grade";
 import { DEMO_EXAM_ID } from "@/lib/demo-data";
-import { API_BASE_URL } from "@/lib/api";
+import { API_BASE_URL, isUuid, paperApi } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
@@ -196,16 +197,29 @@ function IngestionPage() {
   const [items, setItems] = useState<BatchItem[]>([]);
   const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [mode, setMode] = useState<"single" | "batch">("batch");
+  const [mode, setMode] = useState<"one-by-one" | "single" | "batch">("batch");
   const [quickStudent, setQuickStudent] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { data: queue } = usePaperQueue(exam_id);
-  const upload = useBatchUpload(exam_id, setProgress);
-  const setName = useSetStudentName(exam_id);
-  const detail = usePaper(quickStudent, exam_id);
-  const override = useOverride(quickStudent ?? "", exam_id);
+  const { data: examsData } = useExams();
+  const effectiveExamId = useMemo(() => {
+    if (isUuid(exam_id)) return exam_id;
+    const liveExam = examsData?.exams?.find((e) => isUuid(e.id));
+    return liveExam?.id ?? "d8c16cd6-8044-4dde-9376-c17fec086eeb";
+  }, [exam_id, examsData]);
+
+  const upload = useBatchUpload(effectiveExamId, setProgress);
+  const setName = useSetStudentName(effectiveExamId);
+  const detail = usePaper(quickStudent, effectiveExamId);
+  const override = useOverride(quickStudent ?? "", effectiveExamId);
   const papers = useMemo(() => queue?.papers ?? [], [queue]);
+
+  // Priority Evaluation Interceptor state
+  const [showPriorityModal, setShowPriorityModal] = useState(false);
+  const [priorityStudentInput, setPriorityStudentInput] = useState("");
+  const [priorityError, setPriorityError] = useState<string | null>(null);
+  const [isDispatchingPriority, setIsDispatchingPriority] = useState(false);
 
   const [overrideScore, setOverrideScore] = useState<number | null>(null);
   const [overrideNote, setOverrideNote] = useState("");
@@ -237,7 +251,7 @@ function IngestionPage() {
         file: items[0]?.file ?? null,
       });
 
-      if (mode === "single") setItems([]);
+      if (mode === "single" || mode === "one-by-one") setItems([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upload.data]);
@@ -264,16 +278,27 @@ function IngestionPage() {
     };
   }, [papers]);
 
-  const accept = (incoming: FileList | null) => {
+  const accept = (incoming: FileList | File[] | null) => {
     if (!incoming?.length) return;
-    const mapped = Array.from(incoming).map((file, i) => ({
+    const rawFiles = Array.from(incoming);
+    // Strict guardrail: If mode is one-by-one, take strictly acceptedFiles[0] and discard the rest
+    const acceptedFiles =
+      mode === "one-by-one" || mode === "single"
+        ? rawFiles.length > 0
+          ? [rawFiles[0]!]
+          : []
+        : rawFiles;
+    if (!acceptedFiles.length) return;
+
+    const mapped = acceptedFiles.map((file, i) => ({
       id: `${file.name}-${file.size}-${Date.now()}-${i}`,
       file,
       status: "uploaded" as const,
       progress: 0,
     }));
     // One-by-one mode stages exactly the newest sheet; batch mode accumulates.
-    const next = mode === "single" ? mapped.slice(-1) : [...items, ...mapped];
+    const next =
+      mode === "one-by-one" || mode === "single" ? mapped.slice(-1) : [...items, ...mapped];
     if (next.reduce((s, i) => s + i.file.size, 0) > MAX_BATCH_BYTES) {
       toast.error("Batch too large", { description: "Keep each batch under 200 MB." });
       return;
@@ -281,6 +306,103 @@ function IngestionPage() {
     setItems(next);
     if (mapped[0]?.file) {
       useGradeStore.getState().setStudentPaper({ file: mapped[0].file });
+    }
+    // Execution Intercept: Halt any auto-submission and prompt teacher for priority student
+    if (mode === "batch") {
+      setShowPriorityModal(true);
+      setPriorityStudentInput("");
+      setPriorityError(null);
+    }
+  };
+
+  const handlePrioritySubmit = async () => {
+    const rawInput = priorityStudentInput.trim();
+    if (!rawInput) {
+      const errMsg = "Alert: No student record found in the current batch.";
+      setPriorityError(errMsg);
+      toast.error(errMsg);
+      return;
+    }
+
+    const cleanInput = rawInput.toLowerCase().replace(/[_-]/g, " ").replace(/\s+/g, " ");
+
+    const matched = items.find((item) => {
+      const baseName = item.file.name.replace(/\.[^/.]+$/, "").trim().toLowerCase();
+      const cleanBase = baseName.replace(/[_-]/g, " ").replace(/\s+/g, " ");
+      return (
+        cleanBase === cleanInput ||
+        baseName === rawInput.toLowerCase() ||
+        cleanBase.includes(cleanInput) ||
+        cleanInput.includes(cleanBase)
+      );
+    });
+
+    if (!matched) {
+      const errMsg = "Alert: No student record found in the current batch.";
+      setPriorityError(errMsg);
+      toast.error(errMsg);
+      return;
+    }
+
+    setPriorityError(null);
+    setIsDispatchingPriority(true);
+
+    const blobUrl = URL.createObjectURL(matched.file);
+    const studentDisplayName = rawInput || matched.file.name.replace(/\.[^/.]+$/, "");
+
+    try {
+      const res = await paperApi.batchUpload([matched.file], effectiveExamId);
+      const queuedPaper = res.data?.papers?.[0];
+      const assignedId =
+        queuedPaper?.student_id ?? `STU-PRIORITY-${Date.now().toString().slice(-4)}`;
+
+      if (queuedPaper?.student_id) {
+        try {
+          await paperApi.setIdentity(queuedPaper.student_id, studentDisplayName, effectiveExamId);
+        } catch {
+          // ignore identity sync failure
+        }
+      }
+
+      useGradeStore.getState().setActiveStudent(assignedId);
+      useGradeStore.getState().setStudentPaper({
+        studentId: assignedId,
+        url: queuedPaper?.scanned_image_url || blobUrl,
+        file: matched.file,
+      });
+
+      setShowPriorityModal(false);
+      toast.success(`Priority evaluation dispatched for ${studentDisplayName}`, {
+        description: "Fast-tracked through Synonym Matcher, Negation Engine, Anti-Fluff Scorer.",
+      });
+
+      navigate({
+        to: "/diagnostic-studio",
+        search: {
+          exam_id: effectiveExamId,
+          student_id: assignedId,
+          sheet_url: queuedPaper?.scanned_image_url || blobUrl,
+        },
+      });
+    } catch {
+      const fallbackId = `STU-PRIORITY-${Date.now().toString().slice(-3)}`;
+      useGradeStore.getState().setActiveStudent(fallbackId);
+      useGradeStore.getState().setStudentPaper({
+        studentId: fallbackId,
+        url: blobUrl,
+        file: matched.file,
+      });
+      setShowPriorityModal(false);
+      navigate({
+        to: "/diagnostic-studio",
+        search: {
+          exam_id: effectiveExamId,
+          student_id: fallbackId,
+          sheet_url: blobUrl,
+        },
+      });
+    } finally {
+      setIsDispatchingPriority(false);
     }
   };
 
@@ -399,18 +521,18 @@ function IngestionPage() {
             <span className="section-title mr-1 text-[0.6875rem] font-semibold tracking-wide uppercase">
               Mode
             </span>
-            {(["single", "batch"] as const).map((m) => (
+            {(["one-by-one", "batch"] as const).map((m) => (
               <button
                 key={m}
                 onClick={() => setMode(m)}
                 className={cn(
                   "mono-token rounded-md px-3 py-1.5 text-xs transition-colors",
-                  mode === m
+                  mode === m || (m === "one-by-one" && mode === "single")
                     ? "bg-success font-medium text-success-foreground"
                     : "pill-soft text-muted-foreground hover:text-foreground",
                 )}
               >
-                {m === "single" ? "One-by-one" : "Batch"}
+                {m === "one-by-one" ? "One-by-one" : "Batch"}
               </button>
             ))}
           </div>
@@ -424,7 +546,14 @@ function IngestionPage() {
             onDrop={(e) => {
               e.preventDefault();
               setDragging(false);
-              accept(e.dataTransfer.files);
+              const droppedFiles = e.dataTransfer.files;
+              if (mode === "one-by-one" || mode === "single") {
+                const acceptedFiles =
+                  droppedFiles && droppedFiles.length > 0 ? [droppedFiles[0]!] : null;
+                accept(acceptedFiles);
+              } else {
+                accept(droppedFiles);
+              }
             }}
             onClick={() => inputRef.current?.click()}
             className={cn(
@@ -438,11 +567,16 @@ function IngestionPage() {
               multiple={mode === "batch"}
               accept=".pdf,.png,.jpg,.jpeg"
               className="hidden"
-              onChange={(e) => accept(e.target.files)}
+              onChange={(e) => {
+                accept(e.target.files);
+                e.target.value = "";
+              }}
             />
             <UploadCloud size={22} className="text-muted-foreground" />
             <p className="text-sm font-medium">
-              {mode === "single" ? "Add one answer sheet" : "Drop scanned answer sheets here"}
+              {mode === "single" || mode === "one-by-one"
+                ? "Add one answer sheet"
+                : "Drop scanned answer sheets here"}
             </p>
             <p className="mono-token text-xs text-muted-foreground">
               PDF · JPG · PNG — max 200 MB per batch — {items.length} file(s),{" "}
@@ -784,6 +918,105 @@ function IngestionPage() {
           </table>
         </div>
       </div>
+
+      {/* ── Priority Evaluation Interceptor Modal ── */}
+      {showPriorityModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-200"
+        >
+          <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-2xl">
+            <div className="flex items-start justify-between">
+              <div>
+                <span className="mono-token inline-flex items-center gap-1 rounded bg-brand/10 px-2 py-0.5 text-[0.6875rem] font-semibold text-brand uppercase tracking-wider">
+                  Priority Evaluation Interceptor
+                </span>
+                <h3 className="mt-2 text-base font-semibold tracking-tight text-foreground">
+                  Enter the name of the student to evaluate first.
+                </h3>
+              </div>
+              <button
+                type="button"
+                aria-label="Close modal"
+                onClick={() => setShowPriorityModal(false)}
+                className="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+              ScriptGrade will cross-reference this student with the {items.length} staged file(s), fast-track their evaluation through the 3 active frameworks, and transition directly to the Diagnostic Studio.
+            </p>
+
+            {priorityError && (
+              <div
+                role="alert"
+                className="mt-3 flex items-center gap-2 rounded-md border border-alert/60 bg-alert/15 px-3 py-2.5 text-xs font-semibold text-alert animate-in fade-in duration-150"
+              >
+                <AlertTriangle size={15} className="shrink-0 text-alert" />
+                <span>{priorityError}</span>
+              </div>
+            )}
+
+            <div className="mt-4 space-y-1.5">
+              <label
+                htmlFor="priority-student-name"
+                className="mono-token text-[0.6875rem] font-medium text-muted-foreground uppercase"
+              >
+                Student Name / Filename (without extension)
+              </label>
+              <input
+                id="priority-student-name"
+                autoFocus
+                type="text"
+                value={priorityStudentInput}
+                onChange={(e) => {
+                  setPriorityStudentInput(e.target.value);
+                  if (priorityError) setPriorityError(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !isDispatchingPriority) {
+                    e.preventDefault();
+                    void handlePrioritySubmit();
+                  }
+                }}
+                placeholder="e.g. Shahmir Ahmad"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-brand focus:ring-1 focus:ring-brand"
+              />
+            </div>
+
+            <div className="mt-5 flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setShowPriorityModal(false)}
+                className="mono-token rounded-md border border-border px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              >
+                Cancel / Process All
+              </button>
+              <button
+                type="button"
+                onClick={() => void handlePrioritySubmit()}
+                disabled={isDispatchingPriority}
+                className="magnetic inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground disabled:opacity-60"
+              >
+                {isDispatchingPriority ? (
+                  <>
+                    <Loader2 size={13} className="animate-spin" />
+                    <span>Evaluating…</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Evaluate First</span>
+                    <ArrowRight size={13} />
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
